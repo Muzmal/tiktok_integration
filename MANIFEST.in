@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include tiktok_integration *.css
+recursive-include tiktok_integration *.csv
+recursive-include tiktok_integration *.html
+recursive-include tiktok_integration *.ico
+recursive-include tiktok_integration *.js
+recursive-include tiktok_integration *.json
+recursive-include tiktok_integration *.md
+recursive-include tiktok_integration *.png
+recursive-include tiktok_integration *.py
+recursive-include tiktok_integration *.svg
+recursive-include tiktok_integration *.txt
+recursive-exclude tiktok_integration *.pyc
