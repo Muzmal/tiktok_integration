@@ -1,0 +1,85 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-06-19 12:44:34.236931",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enable_tiktok",
+  "is_sandbox",
+  "app_key",
+  "app_secret",
+  "access_token",
+  "refresh_token",
+  "start_connection",
+  "fetch_orders"
+ ],
+ "fields": [
+  {
+   "fieldname": "app_key",
+   "fieldtype": "Data",
+   "label": "App Key"
+  },
+  {
+   "fieldname": "app_secret",
+   "fieldtype": "Password",
+   "label": "App Secret"
+  },
+  {
+   "fieldname": "access_token",
+   "fieldtype": "Password",
+   "label": "Access Token"
+  },
+  {
+   "fieldname": "refresh_token",
+   "fieldtype": "Password",
+   "label": "Refresh Token"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_tiktok",
+   "fieldtype": "Check",
+   "label": "Enable Tiktok"
+  },
+  {
+   "default": "0",
+   "description": "Check this if you are working in sandbox environment",
+   "fieldname": "is_sandbox",
+   "fieldtype": "Check",
+   "label": "Is Sandbox"
+  },
+  {
+   "fieldname": "start_connection",
+   "fieldtype": "Button",
+   "label": "Start Connection"
+  },
+  {
+   "fieldname": "fetch_orders",
+   "fieldtype": "Button",
+   "label": "Fetch Orders"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2023-07-03 10:41:54.451053",
+ "modified_by": "Administrator",
+ "module": "Zaviago Tiktok",
+ "name": "Tiktok with ERPnext",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

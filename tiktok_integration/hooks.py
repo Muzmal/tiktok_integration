@@ -180,6 +180,7 @@ user_data_fields = [
 		"doctype": "{doctype_4}"
 	}
 ]
+fixtures = ["tiktok_order_id"]
 
 # Authentication and authorization
 # --------------------------------
