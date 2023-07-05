@@ -19,6 +19,12 @@ from datetime import datetime
 
 
 class TiktokwithERPnext(Document):
+	# def validate(self):
+		 
+	# 	meta = frappe.get_meta('SAL-ORD-2023-00228')
+	# 	meta.has_field('status') # True
+	# 	fields = meta.get_custom_fields() # [field1, field2, ..]
+	# 	print( f" here are custom fields {fields}" )
 	pass
 
 class handleTiktokRequests:
@@ -54,12 +60,14 @@ class handleTiktokRequests:
 		# 		webbrowser.open( url )   
 	def save_tiktok_order(self,orders):
 		for o in orders: 
-			
+
 			prev_order = frappe.db.exists({"doctype": "Sales Order", "tiktok_order_id": o['order_id']})
 			if( prev_order ):
 				print(f"\n\n Order is already saved {prev_order}: {o['order_id']} \n\n")
 				continue
 			new_order = frappe.new_doc('Sales Order')
+			# if o.get("shipping_provider") is not None:
+			# 	return
 			# print(f"Please Check Order Details {o}")
 			customer_flag = frappe.db.exists("Customer", o['recipient_address']['name'] )
 			if( customer_flag ==None ):
@@ -68,7 +76,7 @@ class handleTiktokRequests:
 			new_order.customer=o['recipient_address']['name']
 			new_order.order_type="Sales"
 			date = o['create_time']
-			print(f"\n\n date is {date} \n\n")
+			
 			date = int(date)/1000
 			date = datetime.utcfromtimestamp(date).strftime('%Y-%m-%d') 
 			new_order.delivery_date=date
@@ -126,7 +134,7 @@ class handleTiktokRequests:
 				ignore_mandatory=True # insert even if mandatory fields are not set
 			)
 		# frappe.msgprint("Created customer")
-		 
+		
 		country = zav_country_map.get(order_address["region_code"])
 		address_type = "Billing"
 		also_shipping=False
@@ -143,7 +151,7 @@ class handleTiktokRequests:
 			"phone": order_address["phone"],
 			 
 			 
-			"links": [{"link_doctype": "Customer", "link_name": 'T** s***box I* b***r'}],
+			"links": [{"link_doctype": "Customer", "link_name": customer_name}],
 			"is_primary_address": int(address_type == "Billing"),
 			"is_shipping_address": int(also_shipping or address_type == "Shipping"),
 		}

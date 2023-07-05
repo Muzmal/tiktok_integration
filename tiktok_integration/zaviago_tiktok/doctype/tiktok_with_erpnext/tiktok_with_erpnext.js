@@ -26,16 +26,13 @@ frappe.ui.form.on('Tiktok with ERPnext', {
 		frappe.call({
 			method: "tiktok_integration.zaviago_tiktok.create_client.redirect_to_auth",
 			type: "POST",
-			args: {},
-			success: function(r) {
-			},
-			error: function(r) {
-				frappe.msgprint("Error")
-			},
-			always: function(r) {},
 			freeze: true,
 			freeze_message: "Redirecting...",
-			
+			callback:function(r){
+				if( r.message.url != null )
+					window.location = r.message.url;
+
+			}
 		});
 	},
 	fetch_orders:function(frm){

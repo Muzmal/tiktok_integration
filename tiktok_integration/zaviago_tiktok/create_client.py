@@ -38,7 +38,10 @@ def redirect_to_auth(  ):
 			connect = CreateTiktokClient()	
 			url = connect.start_connecting ( app_details.app_key,app_details.app_secret,app_details.is_sandbox )
 			if( url ):
-				webbrowser.open( url )
-				print ("Redirecting to auth from function")
+				print (f"Redirecting to auth from function {url}")
+				response_ = {'url':url}
+				return response_
+				exit() 
+				
 	return   
 	
