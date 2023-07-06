@@ -106,23 +106,11 @@ app_license = "MIT"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-#	"all": [
-#		"tiktok_integration.tasks.all"
-#	],
-#	"daily": [
-#		"tiktok_integration.tasks.daily"
-#	],
-#	"hourly": [
-#		"tiktok_integration.tasks.hourly"
-#	],
-#	"weekly": [
-#		"tiktok_integration.tasks.weekly"
-#	]
-#	"monthly": [
-#		"tiktok_integration.tasks.monthly"
-#	]
-# }
+scheduler_events = {
+	"daily": [
+		"tiktok_integration.tasks.daily"
+	],
+}
 
 # Testing
 # -------
