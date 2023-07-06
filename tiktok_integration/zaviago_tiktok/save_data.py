@@ -164,7 +164,12 @@ class saveTiktokData:
 			"is_primary_address": int(address_type == "Billing"),
 			"is_shipping_address": int(also_shipping or address_type == "Shipping"),
 		}
-		).insert(ignore_mandatory=True)
+		).insert(
+			ignore_mandatory=True,
+			ignore_permissions=True, # ignore write permissions during insert
+			ignore_links=True, )
+			
+		
 
 	def _create_product(self,item_name,item_code,item_group):
 		Item = frappe.new_doc('Item')
