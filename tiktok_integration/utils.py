@@ -57,9 +57,12 @@ def webhook_tiktok(  **kwargs ):
     data=response['data']
     if( response['type']==1 ):
         save_order = saveTiktokData()
-        order_list=[]
-        order_list.append(data['order_id'])
-        save_order._fetchOrderDetails(order_list)
+        prev_order = save_order._checkIfOrderExists( data['order_id'],data['order_status'] )
+        if( prev_order == False ):
+            order_list=[]
+            order_list.append(data['order_id'])
+            save_order._fetchOrderDetails(order_list)
+       
      
     print(f"\n\n\n webhook is called again  please verify {data} \n\n\n")
      

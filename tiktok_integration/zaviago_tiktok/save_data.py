@@ -20,6 +20,24 @@ import binascii
 from datetime import datetime
 
 class saveTiktokData:
+	def _checkIfOrderExists(self , tiktok_order,order_status ):
+		prev_order = frappe.db.exists({"doctype": "Sales Order", "tiktok_order_id": tiktok_order})
+		print(f"\n\n\n prev_order Status {prev_order}          \n\n\n\n")
+		if( prev_order ):
+			doc = frappe.get_doc("Sales Order", {"tiktok_order_id": tiktok_order})
+			# doc = frappe.get_doc({"doctype": "Sales Order", "tiktok_order_id": tiktok_order})
+			# print( tiktok_order )
+			# print( doc )
+
+			# print(f"\n\n\n Updated Status {doc.tiktok_order_status}          \n\n\n\n")
+			doc.tiktok_order_status =  order_status 
+			doc.save(
+				ignore_permissions=True, # ignore write permissions during insert
+			)
+			# doc.db_set('tiktok_order_status', order_status)
+			return True
+		else:
+			return False
 	
 
 	def _fetchOrderDetails(self,orderIDs):
@@ -206,9 +224,9 @@ class saveTiktokData:
 
 	def fetchStatusFromCode(self,statusCode):
 		if( statusCode==111 ):
-			return 'Awaiting Shipment'
+			return 'AWAITING_SHIPMENT'
 		elif( statusCode==112 ):
-			return 'Awaiting Collection'
+			return 'AWAITING_COLLECTION'
 		elif( statusCode==114 ):
 			return 'Partial'
 		elif( statusCode==121 ):
@@ -218,9 +236,9 @@ class saveTiktokData:
 		elif( statusCode==130 ):
 			return 'Completed'
 		elif( statusCode==140 ):
-			return 'cancelled'
+			return 'Cancelled'
 		else:
-			return 'pending'
+			return 'UNPAID'
 
 
 zav_country_map = {
