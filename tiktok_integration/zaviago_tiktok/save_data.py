@@ -87,12 +87,14 @@ class saveTiktokData:
 			date = int(date)/1000
 			date = datetime.utcfromtimestamp(date).strftime('%Y-%m-%d') 
 			new_order.delivery_date=date
-			new_order.tiktok_order_id=o['order_id']
-
+			
 			new_order.marketplace_name="Tiktok"
 			new_order.tiktok_order_status = self.fetchStatusFromCode( o['order_status'] )
 			
 			new_order.price_list_currency=o['payment_info']['currency']
+			new_order.tiktok_order_id=o['order_id']
+
+
 			# create property setter for length
 
 			for product in o['item_list']:
