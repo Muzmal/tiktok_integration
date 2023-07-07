@@ -88,6 +88,9 @@ class saveTiktokData:
 			date = datetime.utcfromtimestamp(date).strftime('%Y-%m-%d') 
 			new_order.delivery_date=date
 			new_order.tiktok_order_id=o['order_id']
+
+			new_order.marketplace_name="Tiktok"
+			new_order.tiktok_order_status = self.fetchStatusFromCode( o['order_status'] )
 			
 			new_order.price_list_currency=o['payment_info']['currency']
 			# create property setter for length
@@ -156,10 +159,7 @@ class saveTiktokData:
 			"country": country,
 			"county": order_address["district"],
 			"doctype": "Address",
-			
 			"phone": order_address["phone"],
-			 
-			 
 			"links": [{"link_doctype": "Customer", "link_name": customer_name}],
 			"is_primary_address": int(address_type == "Billing"),
 			"is_shipping_address": int(also_shipping or address_type == "Shipping"),
@@ -202,6 +202,23 @@ class saveTiktokData:
 		return signature
 	
 
+	def fetchStatusFromCode(self,statusCode):
+		if( statusCode==111 ):
+			return 'Awaiting Shipment'
+		elif( statusCode==112 ):
+			return 'Awaiting Collection'
+		elif( statusCode==114 ):
+			return 'Partial'
+		elif( statusCode==121 ):
+			return 'In-Transit'
+		elif( statusCode==122 ):
+			return 'Delivered'
+		elif( statusCode==130 ):
+			return 'Completed'
+		elif( statusCode==140 ):
+			return 'cancelled'
+		else:
+			return 'pending'
 
 
 zav_country_map = {
