@@ -21,7 +21,7 @@ def receive_code_from_tiktok():
     else:
         url = 'https://auth.tiktok-shops.com'
     code = frappe.request.args['code']
-    print(f"\n\n{code}")
+     
     app_secret = app_details.get_password('app_secret')
     params = {'app_key' :app_details.app_key,'app_secret' : app_secret ,"auth_code":code , "grant_type":"authorized_code" }
      
@@ -61,7 +61,7 @@ def webhook_tiktok(  **kwargs ):
         if( prev_order == False ):
             order_list=[]
             order_list.append(data['order_id'])
-            save_order._fetchOrderDetails(order_list)
+            save_order._fetchOrderDetails(order_list,"addNew")
        
      
     print(f"\n\n\n webhook is called again  please verify {data} \n\n\n")

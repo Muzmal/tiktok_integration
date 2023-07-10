@@ -22,25 +22,24 @@ from datetime import datetime
 class saveTiktokData:
 	def _checkIfOrderExists(self , tiktok_order,order_status ):
 		prev_order = frappe.db.exists({"doctype": "Sales Order", "tiktok_order_id": tiktok_order})
-		print(f"\n\n\n prev_order Status {prev_order}          \n\n\n\n")
+		
 		if( prev_order ):
 			doc = frappe.get_doc("Sales Order", {"tiktok_order_id": tiktok_order})
-			# doc = frappe.get_doc({"doctype": "Sales Order", "tiktok_order_id": tiktok_order})
-			# print( tiktok_order )
-			# print( doc )
-
-			# print(f"\n\n\n Updated Status {doc.tiktok_order_status}          \n\n\n\n")
+			order=[]
+			order.append(tiktok_order)
+			updated_order = self._fetchOrderDetails( order,"Update" )
+			print(  f"\n\n\n\n\n  _checkIfOrderExists order is {updated_order}" )
+			self._save_tiktok_order(updated_order,"Update",doc)
 			doc.tiktok_order_status =  order_status 
 			doc.save(
 				ignore_permissions=True, # ignore write permissions during insert
 			)
-			# doc.db_set('tiktok_order_status', order_status)
 			return True
 		else:
 			return False
 	
 
-	def _fetchOrderDetails(self,orderIDs):
+	def _fetchOrderDetails(self,orderIDs,isNew):
 		############################### get order details
 		print("\n\n\n fetchting order details \n\n\n")
 		path='/api/orders/detail/query'
@@ -80,28 +79,41 @@ class saveTiktokData:
 		data = response.json()
 		print( f"\n\n showing single order \n\n" ) 
 		if( data['code']==0 ):
-			order = data['data']['order_list']
-			self._save_tiktok_order(data['data']['order_list'])
+			if( isNew=='Update' ):
+				print(f"\n\n\n\n order to update in fetch order is {data['data']['order_list']}  \n\n\n\n")
+				return data['data']['order_list']
+			else:
+				print(f"\n\n\n\n order to add new is {data['data']['order_list']}  \n\n\n\n")
+				self._save_tiktok_order(data['data']['order_list'],"New",'')
 		return 
 
 
 
 
-	def _save_tiktok_order(self,orders):
+
+	def _save_tiktok_order( self,orders,existingOrder,savedOrder ):
+		print(f"\n\n\n\n order to update is {orders}  \n\n\n\n")
 		for o in orders: 
-			prev_order = frappe.db.exists({"doctype": "Sales Order", "tiktok_order_id": o['order_id']})
-			if( prev_order ):
-				print(f"\n\n Order is already saved {prev_order}: {o['order_id']} \n\n")
-				continue
-			new_order = frappe.new_doc('Sales Order')
+			if( existingOrder == 'New' ):
+				prev_order = frappe.db.exists({"doctype": "Sales Order", "tiktok_order_id": o['order_id']})
+				if( prev_order ):
+					print(f"\n\n Order is already saved {prev_order}: {o['order_id']} \n\n")
+					continue
+				else:
+					new_order = frappe.new_doc('Sales Order')
+					new_order.title=o['recipient_address']['name']
+			else:
+				new_order=savedOrder
+
+			
 			customer_flag = frappe.db.exists("Customer", o['recipient_address']['name'] )
 			if( customer_flag ==None ):
 				self._create_customer( o['recipient_address'],o['recipient_address']['name'] )
-			new_order.title=o['recipient_address']['name']
+			
 			new_order.customer=o['recipient_address']['name']
 			new_order.order_type="Sales"
 			date = o['create_time']
-			print(f"\n\n date is {date} \n\n")
+			 
 			date = int(date)/1000
 			date = datetime.utcfromtimestamp(date).strftime('%Y-%m-%d') 
 			new_order.delivery_date=date
@@ -113,19 +125,18 @@ class saveTiktokData:
 			new_order.tiktok_order_id=o['order_id']
 
 
-			# create property setter for length
+			 
 
 			for product in o['item_list']:
 				item_code = product['seller_sku']
 				Item = frappe.db.exists("Item", str(item_code))
 				if( Item == None ):
-					self._create_product(product['product_name'],product['seller_sku'],"By-product")
+					self._create_product(product['product_name'],product['seller_sku'],"By-product","no")
 				new_order.append("items",{
 					"item_code": product['seller_sku'],
 					"item_name": product['product_name'],
 					"uom": "Kg",
-					# "description": "item description",
-					# "conversion_factor": 1,
+
 					"qty": product['quantity'],
 					"price_list_rate": product['sku_original_price'],
 					"rate": product['sku_original_price'],
@@ -135,12 +146,30 @@ class saveTiktokData:
 					"net_amount": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
 					"billed_amt": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
 					"valuation_rate": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
-					# "gross_profit": "600.00",
-					# "projected_qty": 1,
-					# "actual_qty": 42,
-					# "delivered_qty": 1,
-					# "ordered_qty": 0,
-					# "work_order_qty": 0,
+					})	
+				if( 'shipping_provider' in o ):
+					shipping = frappe.db.exists("Item", str('item_shipping_cost'))
+					if( shipping == None ):
+						self._create_product(product['product_name'],product['seller_sku'],"By-product","yes")
+					shipping_provider=o['shipping_provider']
+					payment_info=o['payment_info']
+					shipping_fee=payment_info['original_shipping_fee']
+					shipping_fee=shipping_fee-payment_info['shipping_fee_platform_discount']
+					shipping_fee=shipping_fee-payment_info['shipping_fee_seller_discount']
+
+					new_order.append("items",{
+					"item_code": 'item_shipping_cost',
+					"item_name": shipping_provider,
+					"uom": "Kg",
+					"qty": "1",
+					"price_list_rate": shipping_fee,
+					"rate": shipping_fee,
+					"amount": shipping_fee,
+					"stock_uom_rate": shipping_fee,
+					"net_rate": shipping_fee,
+					"net_amount": shipping_fee,
+					"billed_amt": shipping_fee,
+					"valuation_rate": shipping_fee,
 					})	
 			response = new_order.insert(
 				ignore_permissions=True, # ignore write permissions during insert
@@ -165,7 +194,7 @@ class saveTiktokData:
 				ignore_mandatory=True # insert even if mandatory fields are not set
 			)
 		frappe.msgprint("Created customer")
-		print("Created customer is")
+		
 
 		country = zav_country_map.get(order_address["region_code"])
 		address_type = "Billing"
@@ -191,7 +220,10 @@ class saveTiktokData:
 			
 		
 
-	def _create_product(self,item_name,item_code,item_group):
+	def _create_product(self,item_name,item_code,item_group,is_shipping):
+		if( is_shipping=='yes' ):
+			item_name='shipping'
+			item_code='item_shipping_cost'
 		Item = frappe.new_doc('Item')
 		Item.item_name=item_name
 		Item.item_code=item_code

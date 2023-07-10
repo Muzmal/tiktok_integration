@@ -4,7 +4,6 @@
 import frappe
 from frappe.model.document import Document
 import requests
-# from tiktok_integration.tiktok_integration.zaviago_tiktok.create_client import CreateTiktokClient
 from tiktok_integration.zaviago_tiktok.create_client import CreateTiktokClient
 import webbrowser
 from tiktok_integration.zaviago_tiktok.save_data import saveTiktokData
@@ -32,32 +31,7 @@ class handleTiktokRequests:
 	limit = 10
 	added_orders=0
 	
-	# def validate(self):
-	# 	print(f"host is  {} ")
 
-
-		# doc='SAL-ORD-2023-00020'
-		# doc = frappe.get_doc("Sales Order",doc)
-		# # meta = frappe.get_meta('Sales Order')
-		#  # True
-		# if( doc.tiktok_order_id):
-		# 	print(f"\n\n have tiktok order id ")
-		# 	print({doc.tiktok_order_id})
-		# else:
-		# 	print(f"\n\n dont have tiktok order id ")
-		# return
-		# self.fetch_orders()
-		# count= 1 
-		# while( self.next_cursor and self.limit>count ):
-		# 	count=count+1
-		# 	print(f"\n\n next cursor is set {count} added orders are {self.added_orders}")
-		# 	self.fetch_orders()
-		# return
-		# if( self.app_key!='' and self.app_secret != '' and self.enable_tiktok ):
-		# 	connect = CreateTiktokClient()	
-		# 	url = connect.start_connecting ( self.app_key,self.app_secret,self.is_sandbox )
-		# 	if( url ):
-		# 		webbrowser.open( url )   
 	def save_tiktok_order(self,orders):
 		for o in orders: 
 
@@ -93,13 +67,12 @@ class handleTiktokRequests:
 				item_code = product['seller_sku']
 				Item = frappe.db.exists("Item", str(item_code))
 				if( Item == None ):
-					self.create_product(product['product_name'],product['seller_sku'],"By-product")
+					self.create_product(product['product_name'],product['seller_sku'],"By-product","no")
+					
 				new_order.append("items",{
 					"item_code": product['seller_sku'],
 					"item_name": product['product_name'],
 					"uom": "Kg",
-					# "description": "item description",
-					# "conversion_factor": 1,
 					"qty": product['quantity'],
 					"price_list_rate": product['sku_original_price'],
 					"rate": product['sku_original_price'],
@@ -109,13 +82,33 @@ class handleTiktokRequests:
 					"net_amount": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
 					"billed_amt": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
 					"valuation_rate": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
-					# "gross_profit": "600.00",
-					# "projected_qty": 1,
-					# "actual_qty": 42,
-					# "delivered_qty": 1,
-					# "ordered_qty": 0,
-					# "work_order_qty": 0,
 					})	
+				if( 'shipping_provider' in o ):
+					shipping = frappe.db.exists("Item", str('item_shipping_cost'))
+					if( shipping == None ):
+						self.create_product(product['product_name'],product['seller_sku'],"By-product","yes")
+					shipping_provider=o['shipping_provider']
+					payment_info=o['payment_info']
+					shipping_fee=payment_info['original_shipping_fee']
+					shipping_fee=shipping_fee-payment_info['shipping_fee_platform_discount']
+					shipping_fee=shipping_fee-payment_info['shipping_fee_seller_discount']
+
+					new_order.append("items",{
+					"item_code": 'item_shipping_cost',
+					"item_name": shipping_provider,
+					"uom": "Kg",
+					"qty": "1",
+					"price_list_rate": shipping_fee,
+					"rate": shipping_fee,
+					"amount": shipping_fee,
+					"stock_uom_rate": shipping_fee,
+					"net_rate": shipping_fee,
+					"net_amount": shipping_fee,
+					"billed_amt": shipping_fee,
+					"valuation_rate": shipping_fee,
+					})	
+
+
 			response = new_order.insert(
 				ignore_permissions=True, # ignore write permissions during insert
 				ignore_links=True, # ignore Link validation in the document
@@ -125,8 +118,6 @@ class handleTiktokRequests:
 			new_order.submit()
 			# frappe.msgprint("Created order")
 			self.added_orders=self.added_orders+1
-			print("Created order is")
-			print(f"\n\n {response} ")
 		return
 	
 	def create_customer(self,order_address,customer_name):
@@ -161,7 +152,10 @@ class handleTiktokRequests:
 		}
 		).insert(ignore_mandatory=True)
 
-	def create_product(self,item_name,item_code,item_group):
+	def create_product(self,item_name,item_code,item_group,is_shipping):
+		if( is_shipping=='yes' ):
+			item_name='shipping'
+			item_code='item_shipping_cost'
 		Item = frappe.new_doc('Item')
 		Item.item_name=item_name
 		Item.item_code=item_code

@@ -11,8 +11,10 @@ from frappe.utils import cint, cstr, get_datetime
 from pytz import timezone
 import random
 import webbrowser
+import json
 
 class CreateTiktokClient:
+
 	def start_connecting( self, app_key , app_secret, is_sandbox ):
 		return self.createAuthRequest(app_key,app_secret,is_sandbox)
 		
@@ -27,7 +29,32 @@ class CreateTiktokClient:
 		qstr = urlencode(params)
 		url = url+'/?'+qstr
 		return url
-
+	
+	def refreshToken( self ):
+			app_details = frappe.get_doc('Tiktok with ERPnext') 
+			url='empty'
+			if( app_details.is_sandbox == True ):
+				url = 'https://auth-sandbox.tiktok-shops.com'
+			else:
+				url = 'https://auth.tiktok-shops.com'
+			state = random.randint(0,10000)
+			url = url+'/api/v2/token/refresh'
+			url = url+"?app_key="+str(app_details.app_key)+"&app_secret="+app_details.get_password('app_secret')+"&refresh_token="+app_details.refresh_token+"&grant_type=refresh_token"
+			headers = {
+				'Content-Type': 'application/json'
+				}
+			response = requests.request("GET", url, headers=headers )
+			data = response.json()
+			if( data['message']=='success' ):
+				frappe.db.set_value('Tiktok with ERPnext','','access_token',data['data']['access_token'])
+				frappe.db.set_value('Tiktok with ERPnext','','refresh_token',data['data']['refresh_token'])
+				frappe.db.commit()
+				
+				url = frappe.utils.get_url()+app_details.get_url()
+			else :
+				print(f"\n\n not working like this ")
+			
+	
 	def get_token_from_code():
 		frappe.msgprint(frappe.request.args)
 
