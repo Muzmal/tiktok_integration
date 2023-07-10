@@ -30,10 +30,7 @@ class saveTiktokData:
 			updated_order = self._fetchOrderDetails( order,"Update" )
 			print(  f"\n\n\n\n\n  _checkIfOrderExists order is {updated_order}" )
 			self._save_tiktok_order(updated_order,"Update",doc)
-			doc.tiktok_order_status =  order_status 
-			doc.save(
-				ignore_permissions=True, # ignore write permissions during insert
-			)
+			# doc.tiktok_order_status =  order_status 
 			return True
 		else:
 			return False
@@ -101,87 +98,100 @@ class saveTiktokData:
 					continue
 				else:
 					new_order = frappe.new_doc('Sales Order')
-					new_order.title=o['recipient_address']['name']
-			else:
-				new_order=savedOrder
+					new_order.price_list_currency=o['payment_info']['currency']
+					date = o['create_time']
+					date = int(date)/1000
+					date = datetime.utcfromtimestamp(date).strftime('%Y-%m-%d') 
+					new_order.delivery_date=date
+					new_order.tiktok_order_id=o['order_id']
+					new_order.marketplace_name="Tiktok"
+					for product in o['item_list']:
+						item_code = product['seller_sku']
+						Item = frappe.db.exists("Item", str(item_code))
+						if( Item == None ):
+							self._create_product(product['product_name'],product['seller_sku'],"By-product","no")
+						new_order.append("items",{
+							"item_code": product['seller_sku'],
+							"item_name": product['product_name'],
+							"uom": "Kg",
 
-			
+							"qty": product['quantity'],
+							"price_list_rate": product['sku_original_price'],
+							"rate": product['sku_original_price'],
+							"amount": product['sku_sale_price'],
+							"stock_uom_rate": product['sku_original_price'],
+							"net_rate": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
+							"net_amount": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
+							"billed_amt": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
+							"valuation_rate": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
+							})	
+					p_info=payment_info=o['payment_info']
+					if( 'shipping_fee' in p_info ):
+							print("Got p infooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+							shipping = frappe.db.exists("Item", 'item_shipping_cost')
+							if( shipping == None ):
+								self._create_product(product['product_name'],product['seller_sku'],"By-product","yes")
+							shipping_provider="Tiktok Shipping"
+							payment_info=o['payment_info']
+							shipping_fee=payment_info['original_shipping_fee']
+							shipping_fee=shipping_fee-payment_info['shipping_fee_platform_discount']
+							shipping_fee=shipping_fee-payment_info['shipping_fee_seller_discount']
+
+							new_order.append("items",{
+							"item_code": 'item_shipping_cost',
+							"item_name": shipping_provider,
+							"uom": "Kg",
+							"qty": "1",
+							"price_list_rate": shipping_fee,
+							"rate": shipping_fee,
+							"amount": shipping_fee,
+							"stock_uom_rate": shipping_fee,
+							"net_rate": shipping_fee,
+							"net_amount": shipping_fee,
+							"billed_amt": shipping_fee,
+							"valuation_rate": shipping_fee,
+							})	
+
+					
+			else:
+				new_order = frappe.get_doc("Sales Order", {"tiktok_order_id": o['order_id']})
+				# new_order.tiktok_order_status = self.fetchStatusFromCode( o['order_status'] )
+				# new_order.save()
+				# return
+
+			new_order.title=o['recipient_address']['name']			
 			customer_flag = frappe.db.exists("Customer", o['recipient_address']['name'] )
 			if( customer_flag ==None ):
 				self._create_customer( o['recipient_address'],o['recipient_address']['name'] )
 			
 			new_order.customer=o['recipient_address']['name']
 			new_order.order_type="Sales"
-			date = o['create_time']
-			 
-			date = int(date)/1000
-			date = datetime.utcfromtimestamp(date).strftime('%Y-%m-%d') 
-			new_order.delivery_date=date
 			
-			new_order.marketplace_name="Tiktok"
+			
 			new_order.tiktok_order_status = self.fetchStatusFromCode( o['order_status'] )
 			
-			new_order.price_list_currency=o['payment_info']['currency']
-			new_order.tiktok_order_id=o['order_id']
+			
 
 
+			
 			 
-
-			for product in o['item_list']:
-				item_code = product['seller_sku']
-				Item = frappe.db.exists("Item", str(item_code))
-				if( Item == None ):
-					self._create_product(product['product_name'],product['seller_sku'],"By-product","no")
-				new_order.append("items",{
-					"item_code": product['seller_sku'],
-					"item_name": product['product_name'],
-					"uom": "Kg",
-
-					"qty": product['quantity'],
-					"price_list_rate": product['sku_original_price'],
-					"rate": product['sku_original_price'],
-					"amount": product['sku_sale_price'],
-					"stock_uom_rate": product['sku_original_price'],
-					"net_rate": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
-					"net_amount": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
-					"billed_amt": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
-					"valuation_rate": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
-					})	
-				if( 'shipping_provider' in o ):
-					shipping = frappe.db.exists("Item", str('item_shipping_cost'))
-					if( shipping == None ):
-						self._create_product(product['product_name'],product['seller_sku'],"By-product","yes")
-					shipping_provider=o['shipping_provider']
-					payment_info=o['payment_info']
-					shipping_fee=payment_info['original_shipping_fee']
-					shipping_fee=shipping_fee-payment_info['shipping_fee_platform_discount']
-					shipping_fee=shipping_fee-payment_info['shipping_fee_seller_discount']
-
-					new_order.append("items",{
-					"item_code": 'item_shipping_cost',
-					"item_name": shipping_provider,
-					"uom": "Kg",
-					"qty": "1",
-					"price_list_rate": shipping_fee,
-					"rate": shipping_fee,
-					"amount": shipping_fee,
-					"stock_uom_rate": shipping_fee,
-					"net_rate": shipping_fee,
-					"net_amount": shipping_fee,
-					"billed_amt": shipping_fee,
-					"valuation_rate": shipping_fee,
-					})	
-			response = new_order.insert(
+			 
+			if( existingOrder =="Update" ):
+				new_order.flags.ignore_mandatory = True
+				new_order.save(
+					ignore_permissions=True, # ignore write permissions during insert
+				)
+				return
+			else :
+				response = new_order.insert(
 				ignore_permissions=True, # ignore write permissions during insert
 				ignore_links=True, # ignore Link validation in the document
 				ignore_if_duplicate=True, # dont insert if DuplicateEntryError is thrown
 				ignore_mandatory=True # insert even if mandatory fields are not set
 			)
 			new_order.submit()
-			frappe.msgprint("Created order")
 			
-			print("Created order is")
-			print(f"\n\n {response} ")
+			frappe.msgprint("Created order")
 		return
 	
 	def _create_customer(self,order_address,customer_name):

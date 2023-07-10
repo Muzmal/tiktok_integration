@@ -83,11 +83,12 @@ class handleTiktokRequests:
 					"billed_amt": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
 					"valuation_rate": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
 					})	
-				if( 'shipping_provider' in o ):
+				p_info=payment_info=o['payment_info']
+				if( 'shipping_fee' in p_info ):
 					shipping = frappe.db.exists("Item", str('item_shipping_cost'))
 					if( shipping == None ):
 						self.create_product(product['product_name'],product['seller_sku'],"By-product","yes")
-					shipping_provider=o['shipping_provider']
+					shipping_provider="Tiktok Shipping"
 					payment_info=o['payment_info']
 					shipping_fee=payment_info['original_shipping_fee']
 					shipping_fee=shipping_fee-payment_info['shipping_fee_platform_discount']
@@ -107,7 +108,6 @@ class handleTiktokRequests:
 					"billed_amt": shipping_fee,
 					"valuation_rate": shipping_fee,
 					})	
-
 
 			response = new_order.insert(
 				ignore_permissions=True, # ignore write permissions during insert
