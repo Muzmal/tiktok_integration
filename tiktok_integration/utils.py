@@ -10,8 +10,13 @@ import time;
 import hashlib
 import hmac
 import binascii
-
+from frappe.utils import cstr, flt, cint, get_files_path
+from PIL import Image
+import requests
 from tiktok_integration.zaviago_tiktok.save_data import saveTiktokData
+ 
+
+
 
 @frappe.whitelist( )
 def receive_code_from_tiktok():
@@ -49,12 +54,32 @@ def receive_code_from_tiktok():
 
 @frappe.whitelist(allow_guest=True)
 def webhook_tiktok(  **kwargs ):
+    # signature = frappe.request.headers.get("Authorization")
+
+     
+    # print( f"\n\n\ signature is {frappe.request.headers}"  )
+    # return
+    # tiktok = saveTiktokData()
+
+    
+     
+   
 
     app_details = frappe.get_doc('Tiktok with ERPnext') 
-    # data=frappe.request['post']
+    
+    app_secret = app_details.get_password('app_secret')
     response=frappe._dict(kwargs)
-
     data=response['data']
+    # hm = hmac.new(bytes(app_secret), string_to_sign, hashlib.sha512)
+    # signature1 = hm.hexdigest()
+
+    # signature1= tiktok._getSignature('',response,app_secret)
+    # print( f"\n\n\ signature 1 is {signature1}"  )
+    # data=frappe.request['post']
+    
+    print( f"\n\n\ body is {response}"  )
+
+    
     if( response['type']==1 ):
         save_order = saveTiktokData()
         prev_order = save_order._checkIfOrderExists( data['order_id'],data['order_status'] )
@@ -65,6 +90,4 @@ def webhook_tiktok(  **kwargs ):
        
      
     print(f"\n\n\n webhook is called again  please verify {data} \n\n\n")
-     
-
     return

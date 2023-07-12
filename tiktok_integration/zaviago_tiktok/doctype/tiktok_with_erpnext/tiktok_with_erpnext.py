@@ -15,16 +15,18 @@ import hashlib
 import hmac
 import binascii
 from datetime import datetime
+from PIL import Image
+from frappe.utils.file_manager import save_file
 
+from frappe.utils import cstr, flt, cint, get_files_path
 
 class TiktokwithERPnext(Document):
-	# def validate(self):
-		 
-	# 	meta = frappe.get_meta('SAL-ORD-2023-00228')
-	# 	meta.has_field('status') # True
-	# 	fields = meta.get_custom_fields() # [field1, field2, ..]
-	# 	print( f" here are custom fields {fields}" )
-	pass
+	def validate(self):
+			# customer_name="Manual"
+			# # customer_group  = frappe.db.exists("Customer Group", "Tiktok")
+
+			return
+	# pass
 
 class handleTiktokRequests:
 	next_cursor=False
@@ -57,6 +59,7 @@ class handleTiktokRequests:
 			new_order.tiktok_order_id=o['order_id']
 			save_order_class=saveTiktokData()
 			new_order.marketplace_name="Tiktok"
+
 			new_order.tiktok_order_status = save_order_class.fetchStatusFromCode(o['order_status'])
 			# add status here
 			
@@ -68,7 +71,11 @@ class handleTiktokRequests:
 				Item = frappe.db.exists("Item", str(item_code))
 				if( Item == None ):
 					self.create_product(product['product_name'],product['seller_sku'],"By-product","no")
-					
+					p_img = save_order_class.fechProductImage( product['product_id'] )
+					if( p_img ):
+							print(f" Got product image { p_img }")
+							save_order_class.addImageToItem(p_img,product['seller_sku'])
+
 				new_order.append("items",{
 					"item_code": product['seller_sku'],
 					"item_name": product['product_name'],
@@ -93,6 +100,7 @@ class handleTiktokRequests:
 					shipping_fee=payment_info['original_shipping_fee']
 					shipping_fee=shipping_fee-payment_info['shipping_fee_platform_discount']
 					shipping_fee=shipping_fee-payment_info['shipping_fee_seller_discount']
+
 
 					new_order.append("items",{
 					"item_code": 'item_shipping_cost',
@@ -121,8 +129,36 @@ class handleTiktokRequests:
 		return
 	
 	def create_customer(self,order_address,customer_name):
+		customer_group = frappe.db.exists("Customer Group", "Tiktok")
+		if( customer_group == None ):
+			print( f"  \n \n \n \n  Creating customer group \n \n \n \n ")
+			new_customer_group = frappe.new_doc('Customer Group')
+			new_customer_group.customer_group_name="Tiktok"
+			new_customer_group.insert(
+				ignore_permissions=True, # ignore write permissions during insert
+				ignore_links=True, # ignore Link validation in the document
+				ignore_if_duplicate=True, # dont insert if DuplicateEntryError is thrown
+				ignore_mandatory=True # insert even if mandatory fields are not set
+			)
+				
+		# territory  = frappe.db.exists({"doctype": "Territory", "territory_name": "Thailand"})
+		territory = frappe.db.exists("Territory", "Thailand")
+		if( territory == None ):
+			print( f"  \n \n \n \n  Creating customer territory \n \n \n \n ")
+			new_territory = frappe.new_doc('Territory')
+			
+			new_territory.territory_name="Thailand"
+			new_territory.insert(
+				ignore_permissions=True, # ignore write permissions during insert
+				ignore_links=True, # ignore Link validation in the document
+				ignore_if_duplicate=True, # dont insert if DuplicateEntryError is thrown
+				ignore_mandatory=True # insert even if mandatory fields are not set
+			)
+
 		new_customer = frappe.new_doc('Customer')
 		new_customer.customer_name=customer_name
+		new_customer.customer_group="Tiktok"
+		new_customer.territory="Thailand"
 		response = new_customer.insert(
 				ignore_permissions=True, # ignore write permissions during insert
 				ignore_links=True, # ignore Link validation in the document

@@ -83,7 +83,50 @@ class saveTiktokData:
 				print(f"\n\n\n\n order to add new is {data['data']['order_list']}  \n\n\n\n")
 				self._save_tiktok_order(data['data']['order_list'],"New",'')
 		return 
+	
 
+	def fechProductImage( self,product_id ):
+		imgUrl=False
+		path='/api/products/details'
+		app_details = frappe.get_doc('Tiktok with ERPnext') 
+		access_token = app_details.get_password('access_token')
+		app_secret = app_details.get_password('app_secret')
+		gmt = time.gmtime()
+		timestamp = calendar.timegm(gmt)   
+		if( app_details.is_sandbox == True ):
+			url = 'https://open-api-sandbox.tiktokglobalshop.com'
+		else:
+			url = 'https://open-api.tiktokglobalshop.com/'
+		query = {
+				"app_key":app_details.app_key,
+				'access_token':access_token,
+				'timestamp':timestamp,
+				'product_id':str(product_id)
+			}
+		params_for_sign = query
+		del params_for_sign['access_token']
+		tiktok = saveTiktokData()
+		signature = tiktok._getSignature(path,params_for_sign,app_secret)
+		url = url+path+"?app_key="+str(app_details.app_key)+"&access_token="+str(access_token)+"&sign="+str(signature)+"&timestamp="+str(timestamp)+"&product_id="+str(product_id)
+		payload = json.dumps({
+		#"order_id_list": ['577463955647466245']
+		"product_id": '1729622829106760283'
+		})
+		headers = {
+		'Content-Type': 'application/json'
+		}
+		res = requests.get(url, headers=headers, data=payload )
+		data = res.json()
+		frappe.msgprint( data )
+		
+		if( data['code'] == 0 ):
+			img = data['data']
+			img = img['images']
+			for i in img:
+				imgUrl = i['thumb_url_list'][0] 
+				break
+			
+		return imgUrl
 
 
 
@@ -105,16 +148,21 @@ class saveTiktokData:
 					new_order.delivery_date=date
 					new_order.tiktok_order_id=o['order_id']
 					new_order.marketplace_name="Tiktok"
+					new_order.marketplace="Tiktok"
 					for product in o['item_list']:
 						item_code = product['seller_sku']
 						Item = frappe.db.exists("Item", str(item_code))
 						if( Item == None ):
 							self._create_product(product['product_name'],product['seller_sku'],"By-product","no")
+							p_img = self.fechProductImage( product['product_id'] )
+							if( p_img ):
+								print(f" Got product image { p_img }")
+								self.addImageToItem(p_img,product['seller_sku'])
+								
 						new_order.append("items",{
 							"item_code": product['seller_sku'],
 							"item_name": product['product_name'],
 							"uom": "Kg",
-
 							"qty": product['quantity'],
 							"price_list_rate": product['sku_original_price'],
 							"rate": product['sku_original_price'],
@@ -127,7 +175,7 @@ class saveTiktokData:
 							})	
 					p_info=payment_info=o['payment_info']
 					if( 'shipping_fee' in p_info ):
-							print("Got p infooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+							
 							shipping = frappe.db.exists("Item", 'item_shipping_cost')
 							if( shipping == None ):
 								self._create_product(product['product_name'],product['seller_sku'],"By-product","yes")
@@ -161,7 +209,7 @@ class saveTiktokData:
 
 			new_order.title=o['recipient_address']['name']			
 			customer_flag = frappe.db.exists("Customer", o['recipient_address']['name'] )
-			if( customer_flag ==None ):
+			if( customer_flag == None ):
 				self._create_customer( o['recipient_address'],o['recipient_address']['name'] )
 			
 			new_order.customer=o['recipient_address']['name']
@@ -170,11 +218,6 @@ class saveTiktokData:
 			
 			new_order.tiktok_order_status = self.fetchStatusFromCode( o['order_status'] )
 			
-			
-
-
-			
-			 
 			 
 			if( existingOrder =="Update" ):
 				new_order.flags.ignore_mandatory = True
@@ -195,15 +238,45 @@ class saveTiktokData:
 		return
 	
 	def _create_customer(self,order_address,customer_name):
-		
+		print( f"  \n \n \n \n  Creating customer  \n \n \n \n ")
+		# customer_group_name
+		# customer_group  = frappe.db.exists({"doctype": "Customer Group", "customer_group_name": "Tiktok"})
+		customer_group = frappe.db.exists("Customer Group", "Tiktok")
+		if( customer_group == None ):
+			print( f"  \n \n \n \n  Creating customer group \n \n \n \n ")
+			new_customer_group = frappe.new_doc('Customer Group')
+			new_customer_group.customer_group_name="Tiktok"
+			new_customer_group.insert(
+				ignore_permissions=True, # ignore write permissions during insert
+				ignore_links=True, # ignore Link validation in the document
+				ignore_if_duplicate=True, # dont insert if DuplicateEntryError is thrown
+				ignore_mandatory=True # insert even if mandatory fields are not set
+			)
+				
+		# territory  = frappe.db.exists({"doctype": "Territory", "territory_name": "Thailand"})
+		territory = frappe.db.exists("Territory", "Thailand")
+		if( territory == None ):
+			print( f"  \n \n \n \n  Creating customer territory \n \n \n \n ")
+			new_territory = frappe.new_doc('Territory')
+			
+			new_territory.territory_name="Thailand"
+			new_territory.insert(
+				ignore_permissions=True, # ignore write permissions during insert
+				ignore_links=True, # ignore Link validation in the document
+				ignore_if_duplicate=True, # dont insert if DuplicateEntryError is thrown
+				ignore_mandatory=True # insert even if mandatory fields are not set
+			)
+
 		new_customer = frappe.new_doc('Customer')
 		new_customer.customer_name=customer_name
+		new_customer.customer_group="Tiktok"
+		new_customer.territory="Thailand"
 		response = new_customer.insert(
 				ignore_permissions=True, # ignore write permissions during insert
 				ignore_links=True, # ignore Link validation in the document
 				ignore_mandatory=True # insert even if mandatory fields are not set
 			)
-		frappe.msgprint("Created customer")
+		print("  \n \n \n \n  Created customer")
 		
 
 		country = zav_country_map.get(order_address["region_code"])
@@ -238,6 +311,7 @@ class saveTiktokData:
 		Item.item_name=item_name
 		Item.item_code=item_code
 		Item.item_group=item_group
+		
 		response = Item.insert(
 				ignore_permissions=True, # ignore write permissions during insert
 				ignore_links=True, # ignore Link validation in the document
@@ -281,6 +355,23 @@ class saveTiktokData:
 			return 'Cancelled'
 		else:
 			return 'UNPAID'
+		
+	def addImageToItem(self,image_url,item_title):
+
+		new_file = frappe.new_doc("File")
+		new_file.file_name=str(item_title)+"_photo.jpeg"
+
+		new_file.attached_to_doctype='Item'
+		new_file.attached_to_name=str(item_title)
+
+		new_file.file_url=image_url
+		response = new_file.insert(
+				ignore_mandatory=True,
+				ignore_permissions=True, # ignore write permissions during insert
+				ignore_links=True, )
+		return
+
+
 
 
 zav_country_map = {
