@@ -58,7 +58,8 @@ class handleTiktokRequests:
 			new_order.delivery_date=date
 			new_order.tiktok_order_id=o['order_id']
 			save_order_class=saveTiktokData()
-			new_order.marketplace_name="Tiktok"
+			# new_order.marketplace_name="Tiktok"
+			new_order.marketplace_order_number=o['order_id']
 
 			new_order.tiktok_order_status = save_order_class.fetchStatusFromCode(o['order_status'])
 			# add status here

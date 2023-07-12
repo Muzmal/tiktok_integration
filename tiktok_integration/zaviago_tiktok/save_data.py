@@ -147,7 +147,8 @@ class saveTiktokData:
 					date = datetime.utcfromtimestamp(date).strftime('%Y-%m-%d') 
 					new_order.delivery_date=date
 					new_order.tiktok_order_id=o['order_id']
-					new_order.marketplace_name="Tiktok"
+					# new_order.marketplace_name="Tiktok"
+					new_order.marketplace_order_number=o['order_id']
 					new_order.marketplace="Tiktok"
 					for product in o['item_list']:
 						item_code = product['seller_sku']
