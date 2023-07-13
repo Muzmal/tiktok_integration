@@ -14,7 +14,7 @@ from frappe.utils import cstr, flt, cint, get_files_path
 from PIL import Image
 import requests
 from tiktok_integration.zaviago_tiktok.save_data import saveTiktokData
- 
+import base64
 
 
 
@@ -51,43 +51,27 @@ def receive_code_from_tiktok():
     return  
 
 
-
 @frappe.whitelist(allow_guest=True)
 def webhook_tiktok(  **kwargs ):
-    # signature = frappe.request.headers.get("Authorization")
-
-     
-    # print( f"\n\n\ signature is {frappe.request.headers}"  )
-    # return
-    # tiktok = saveTiktokData()
-
-    
-     
-   
-
+    signature = frappe.request.headers.get("Authorization")
+    save_order = saveTiktokData()
     app_details = frappe.get_doc('Tiktok with ERPnext') 
-    
     app_secret = app_details.get_password('app_secret')
     response=frappe._dict(kwargs)
-    data=response['data']
-    # hm = hmac.new(bytes(app_secret), string_to_sign, hashlib.sha512)
-    # signature1 = hm.hexdigest()
-
-    # signature1= tiktok._getSignature('',response,app_secret)
-    # print( f"\n\n\ signature 1 is {signature1}"  )
-    # data=frappe.request['post']
-    
-    print( f"\n\n\ body is {response}"  )
-
-    
-    if( response['type']==1 ):
-        save_order = saveTiktokData()
-        prev_order = save_order._checkIfOrderExists( data['order_id'],data['order_status'] )
-        if( prev_order == False ):
-            order_list=[]
-            order_list.append(data['order_id'])
-            save_order._fetchOrderDetails(order_list,"addNew")
-       
-     
-    print(f"\n\n\n webhook is called again  please verify {data} \n\n\n")
+    get_data = frappe.request.get_data()
+    string_to_sign = app_details.app_key + str(get_data,'utf-8')
+    signature1=hmac.new(bytes(app_secret, 'UTF-8'), string_to_sign.encode('UTF-8'), hashlib.sha256).hexdigest()
+    print(  f" get_data: {get_data}  signature1 : {signature1}, signature : {signature}"  )
+    veification =  hmac.compare_digest( signature1,signature ) 
+    if( veification ):
+        data=response['data']
+        if( response['type']==1 ):
+            prev_order = save_order._checkIfOrderExists( data['order_id'],data['order_status'] )
+            if( prev_order == False ):
+                order_list=[]
+                order_list.append(data['order_id'])
+                save_order._fetchOrderDetails(order_list,"addNew")
+        print(f"\n\n\n webhook is called again  please verify {data} \n\n\n")
+    else:
+        print(f"\n\n\n webhook is called with wrong signature \n\n\n")
     return
