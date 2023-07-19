@@ -65,6 +65,39 @@ frappe.ui.form.on('Tiktok with ERPnext', {
 			freeze_message: "Fetching Orders...",
 			
 		});
+	},
+	fetch_products:function(frm){
+		
+		if( !frm.doc.enable_tiktok){
+			frappe.msgprint("Please enable tiktok api")
+			return
+		}
+		if( frm.doc.app_key =='' ){
+			frappe.msgprint("Please add tiktok app key")
+			return
+		}
+		if( frm.doc.app_secret =='' ){
+			frappe.msgprint("Please add tiktok app secret")
+			return
+		}
+		if( frm.doc.access_token =='' ){
+			frappe.msgprint("Please start connection to get accesstoken")
+			return
+		}
+		
+		frappe.call({
+			method: "tiktok_integration.zaviago_tiktok.doctype.tiktok_with_erpnext.tiktok_with_erpnext.ajax_init_fetch_products",
+			type: "POST",
+			args: {},
+			success: function(r) {
+				frappe.msgprint("Please sss")
+			},
+			error: function(r) {},
+			always: function(r) {},
+			freeze: true,
+			freeze_message: "Fetching Products...",
+			
+		});
 	}
 	// }
 	// enable_tiktok: function (frm){

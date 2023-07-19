@@ -85,7 +85,8 @@ class saveTiktokData:
 		return 
 	
 
-	def fechProductImage( self,product_id ):
+	def fetchProduct( self,product_id,return_image ):
+		
 		imgUrl=False
 		path='/api/products/details'
 		app_details = frappe.get_doc('Tiktok with ERPnext') 
@@ -117,16 +118,22 @@ class saveTiktokData:
 		}
 		res = requests.get(url, headers=headers, data=payload )
 		data = res.json()
-		frappe.msgprint( data )
+		 
+		if( return_image==True ):
+			if( data['code'] == 0 ):
+				img = data['data']
+				img = img['images']
+				for i in img:
+					imgUrl = i['thumb_url_list'][0] 
+					break
+			return_value= imgUrl
+		else:
+			return_value = data['data']
+
+		print(f" return value is {return_value}")
+		return return_value
 		
-		if( data['code'] == 0 ):
-			img = data['data']
-			img = img['images']
-			for i in img:
-				imgUrl = i['thumb_url_list'][0] 
-				break
-			
-		return imgUrl
+		
 
 
 
@@ -155,7 +162,7 @@ class saveTiktokData:
 						Item = frappe.db.exists("Item", str(item_code))
 						if( Item == None ):
 							self._create_product(product['product_name'],product['seller_sku'],"By-product","no")
-							p_img = self.fechProductImage( product['product_id'] )
+							p_img = self.fetchProduct( product['product_id'],return_image=True )
 							if( p_img ):
 								print(f" Got product image { p_img }")
 								self.addImageToItem(p_img,product['seller_sku'])

@@ -13,7 +13,10 @@
   "access_token",
   "refresh_token",
   "start_connection",
-  "fetch_orders"
+  "actions_section",
+  "fetch_orders",
+  "column_break_mxrjz",
+  "fetch_products"
  ],
  "fields": [
   {
@@ -58,12 +61,26 @@
    "fieldname": "fetch_orders",
    "fieldtype": "Button",
    "label": "Fetch Orders"
+  },
+  {
+   "fieldname": "actions_section",
+   "fieldtype": "Section Break",
+   "label": "Actions"
+  },
+  {
+   "fieldname": "column_break_mxrjz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fetch_products",
+   "fieldtype": "Button",
+   "label": "Fetch Products"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-07-03 10:41:54.451053",
+ "modified": "2023-07-14 13:34:48.637077",
  "modified_by": "Administrator",
  "module": "Zaviago Tiktok",
  "name": "Tiktok with ERPnext",
