@@ -30,11 +30,17 @@ class handleTiktokRequests:
 	next_cursor=False
 	limit = 10
 	added_orders=0
-	
+	app_details = frappe.get_doc('Tiktok with ERPnext')
+	if( app_details.enable_tiktok == True ):
+		if( app_details.maximum_orders_to_fetch and app_details.maximum_orders_to_fetch<=100 ):
+			max_number=app_details.maximum_orders_to_fetch
+		else:
+			max_number = 100
 
 	def save_tiktok_order(self,orders):
 		for o in orders: 
-
+			if( self.added_orders >= self.max_number ):
+				break
 			prev_order = frappe.db.exists({"doctype": "Sales Order", "tiktok_order_id": o['order_id']})
 			if( prev_order ):
 				print(f"\n\n Order is already saved {prev_order}: {o['order_id']} \n\n")
@@ -54,9 +60,11 @@ class handleTiktokRequests:
 			date = int(date)/1000
 			date = datetime.utcfromtimestamp(date).strftime('%Y-%m-%d') 
 			new_order.delivery_date=date
+			new_order.transaction_date=date
 			new_order.tiktok_order_id=o['order_id']
 			save_order_class=saveTiktokData()
 			# new_order.marketplace_name="Tiktok"
+			new_order.marketplace="Tiktok"
 			new_order.marketplace_order_number=o['order_id']
 
 			new_order.tiktok_order_status = save_order_class.fetchStatusFromCode(o['order_status'])
@@ -246,8 +254,9 @@ class handleTiktokRequests:
 		if( data['code']==0 ):
 			print(f"\n\n {data['data']} ")
 			order_list=[]
-			for order in data['data']['order_list']:
-				order_list.append(order['order_id'])
+			if ( 'order_list' in data['data'] ) :
+				for order in data['data']['order_list']:
+					order_list.append(order['order_id'])
 			self.fetchOrderDetails(order_list)
 			if( data['data']['more']==True ):
 				print(f"\n\n next cursor is {data['data']['next_cursor']} \n\n")
@@ -470,10 +479,18 @@ class handleTiktokRequests:
 def ajax_init_fetch_orders():
 	app_details = frappe.get_doc('Tiktok with ERPnext')
 	if( app_details.enable_tiktok == True ):
+		if( app_details.maximum_orders_to_fetch and app_details.maximum_orders_to_fetch<=100 ):
+			max_number=app_details.maximum_orders_to_fetch
+		else:
+			max_number = 100
+		print(f" max_number is  {max_number} ")
+		
 		tiktok = handleTiktokRequests()
 		tiktok.fetch_orders( )
 		count= 1 
-		while( tiktok.next_cursor ):
+		while( tiktok.next_cursor and tiktok.added_orders <= max_number ):
+			print(f" tiktok.added_order is  {tiktok.added_orders} ")
+			# return
 			count=count+1
 			print(f"\n\n next cursor is set {count} added orders are {tiktok.added_orders}")
 			tiktok.fetch_orders()

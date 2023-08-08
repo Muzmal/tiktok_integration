@@ -10,6 +10,7 @@
   "is_sandbox",
   "app_key",
   "app_secret",
+  "maximum_orders_to_fetch",
   "access_token",
   "refresh_token",
   "start_connection",
@@ -75,12 +76,21 @@
    "fieldname": "fetch_products",
    "fieldtype": "Button",
    "label": "Fetch Products"
+  },
+  {
+   "description": "Maximum number of orders to fetch when \"Fetch Orders\"  button is clicked. Number is less than 100",
+   "fieldname": "maximum_orders_to_fetch",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Maximum Orders to fetch",
+   "non_negative": 1,
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-07-14 13:34:48.637077",
+ "modified": "2023-08-08 12:55:53.403754",
  "modified_by": "Administrator",
  "module": "Zaviago Tiktok",
  "name": "Tiktok with ERPnext",
