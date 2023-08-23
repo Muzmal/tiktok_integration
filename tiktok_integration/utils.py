@@ -38,12 +38,18 @@ def receive_code_from_tiktok():
     frappe.msgprint( data['message'] )
 
     if( data['message']=='success' ):
-        frappe.db.set_value('Tiktok with ERPnext','','access_token',data['data']['access_token'])
-        frappe.db.set_value('Tiktok with ERPnext','','refresh_token',data['data']['refresh_token'])
+        doc = frappe.get_doc('Tiktok with ERPnext')
+        doc.access_token=data['data']['access_token']
+        doc.refresh_token=data['data']['refresh_token']
+        doc.save(
+             ignore_permissions=True, # ignore write permissions during insert
+             ignore_version=True # do not create a version record
+        )
+
         frappe.db.commit()
         
         url = frappe.utils.get_url()+app_details.get_url()
-        print(f"\n\n url is {url} ")
+        
         webbrowser.open( url,new=0 )
     else :
         print(f"\n\n not working like this ")
@@ -52,7 +58,7 @@ def receive_code_from_tiktok():
 
 
 @frappe.whitelist(allow_guest=True)
-def webhook_tiktok(  **kwargs ):
+def webhook_tiktok( **kwargs ):
     signature = frappe.request.headers.get("Authorization")
     save_order = saveTiktokData()
     app_details = frappe.get_doc('Tiktok with ERPnext') 

@@ -20,6 +20,7 @@ import binascii
 from datetime import datetime
 
 class saveTiktokData:
+	orderData=[]
 	def _checkIfOrderExists(self , tiktok_order,order_status ):
 		prev_order = frappe.db.exists({"doctype": "Sales Order", "tiktok_order_id": tiktok_order})
 		
@@ -86,7 +87,8 @@ class saveTiktokData:
 	
 
 	def fetchProduct( self,product_id,return_image ):
-		
+		print( 'product_id' )
+		print(product_id)
 		imgUrl=False
 		path='/api/products/details'
 		app_details = frappe.get_doc('Tiktok with ERPnext') 
@@ -129,7 +131,7 @@ class saveTiktokData:
 			return_value= imgUrl
 		else:
 			return_value = data['data']
-
+		self.orderData=data['data']
 		print(f" return value is {return_value}")
 		return return_value
 		
@@ -159,15 +161,21 @@ class saveTiktokData:
 					new_order.marketplace_order_number=o['order_id']
 					new_order.marketplace="Tiktok"
 					for product in o['item_list']:
+						if( product['seller_sku'] =='' ):
+							product['seller_sku']="no-sku-"+str(product['product_id'])
 						item_code = product['seller_sku']
 						Item = frappe.db.exists("Item", str(item_code))
 						if( Item == None ):
 							self._create_product(product['product_name'],product['seller_sku'],"By-product","no")
 							p_img = self.fetchProduct( product['product_id'],return_image=True )
+							self.saveTiktokProductWebhook(self.orderData)
 							if( p_img ):
 								print(f" Got product image { p_img }")
 								self.addImageToItem(p_img,product['seller_sku'])
-								
+							# tiktok_doc = TiktokwithERPnext()
+							# ifExist=self.checkIfDocExists( product['product_id'] )
+							# if( ifExist == None ):	
+							# 	tiktok_doc.saveTiktokProduct( product )
 						new_order.append("items",{
 							"item_code": product['seller_sku'],
 							"item_name": product['product_name'],
@@ -313,19 +321,35 @@ class saveTiktokData:
 		
 
 	def _create_product(self,item_name,item_code,item_group,is_shipping):
+		item_group="Tiktok"
 		if( is_shipping=='yes' ):
 			item_name='shipping'
 			item_code='item_shipping_cost'
 		Item = frappe.new_doc('Item')
 		Item.item_name=item_name
 		Item.item_code=item_code
-		Item.item_group=item_group
+		item_group = frappe.db.exists("Item Group", item_group )
+		if( item_group == None ):
+			print( f"  \n \n \n \n  Creating item group   \n \n \n \n ")
+			new_item_group = frappe.new_doc('Item Group')
+			new_item_group.item_group_name="Tiktok"
+			new_item_group.parent_item_group="All Item Groups"
+			new_item_group.insert(
+				ignore_permissions=True, # ignore write permissions during insert
+				ignore_links=True, # ignore Link validation in the document
+				ignore_if_duplicate=True, # dont insert if DuplicateEntryError is thrown
+				ignore_mandatory=True # insert even if mandatory fields are not set
+			)
+
+		Item.item_group="Tiktok"
+		
 		
 		response = Item.insert(
 				ignore_permissions=True, # ignore write permissions during insert
 				ignore_links=True, # ignore Link validation in the document
 				ignore_mandatory=True # insert even if mandatory fields are not set
 			)
+		frappe.db.commit()
 		frappe.msgprint("Created Item")
 		print("Created Item is")
 		print(f"\n\n {Item} ")
@@ -378,8 +402,97 @@ class saveTiktokData:
 				ignore_mandatory=True,
 				ignore_permissions=True, # ignore write permissions during insert
 				ignore_links=True, )
+		frappe.db.commit()
 		return
 
+	def saveTiktokProductWebhook( self,tiktokProduct ):
+		if( self.checkIfDocExistsWebhook( tiktokProduct['product_id'] )==False ):
+			return
+		#start adding product in tiktok doctype
+		new_product = frappe.new_doc('Tiktok Products')
+		k = 0
+		is_variable=False
+		profileImg=''
+		k = 0
+		cat_local_display_name=''
+		if( 'category_list' in tiktokProduct ):
+			category_list = tiktokProduct['category_list']
+			for i in category_list:
+				print(f" We have found category {i['local_display_name'] }")
+				cat_local_display_name = i['local_display_name']
+				k=k+1
+		new_product.tiktok_product_categories=cat_local_display_name
+		array_of_images=False
+		if( 'images' in tiktokProduct ):
+			images=tiktokProduct['images']
+			k=0
+			array_of_images=[]
+			for i in images:
+				if( k==0 ):
+					profileImg = i['thumb_url_list'][0]
+				array_of_images.append(i['thumb_url_list'])
+				k=k+1
+
+		if( array_of_images ):
+			del array_of_images[0]
+			for addImg in array_of_images: 	
+				new_product.append('additional_images',{
+					"additional_image_src":addImg[0],
+					"additional_image":addImg[0]
+				})
+		description=''
+		if( 'description' in tiktokProduct ):
+			description = tiktokProduct['description']
+		brand_name=''
+		if( 'brand' in tiktokProduct ):
+			brand = tiktokProduct['brand']
+			brand_name=brand['name']
+		seller_sku='...'
+		price=''
+		l=0
+		if( 'skus' in tiktokProduct ):
+			for sku in tiktokProduct['skus']:
+				seller_sku = sku['seller_sku']
+				price = sku['price']
+				price=price['original_price']
+				if( 'sales_attributes' in sku ):
+					sales_attributes = sku['sales_attributes']
+					for j in sales_attributes:
+						l=l+1
+		if( l>1 ):
+			is_variable=True
+			seller_sku=''
+		new_product.has_variants=is_variable
+		new_product.product_name=tiktokProduct['product_name']
+		new_product.erpnext_item_name=tiktokProduct['product_name']
+
+		new_product.item_name=tiktokProduct['product_name']
+		new_product.marketplace_id=tiktokProduct['product_id']
+		new_product.brand=brand_name
+		new_product.stock_keeping_unit_sku=seller_sku
+		# new_product.disabled=tiktokProduct['product_id']
+		# new_product.has_variants=tiktokProduct['product_id']
+		new_product.profile_image_src=profileImg
+		# new_product.additional_images=tiktokProduct['product_id']
+
+		new_product.product_price=price
+
+		# new_product.create_discount_campaign=tiktokProduct['product_id']
+
+		new_product.long_description=description
+		new_product.save(
+			ignore_permissions=True, # ignore write permissions during insert
+		)
+		if( seller_sku=='' ):
+			seller_sku="no-sku-"+str(tiktokProduct['product_id'])
+		Item = frappe.db.exists("Item", str(seller_sku))
+		if( Item == None ):
+			self.create_product(tiktokProduct['product_name'],seller_sku,"By-product","no")
+		return True
+
+	def checkIfDocExistsWebhook( self,product_id ):
+		print(f"product id is {product_id} ")
+		return frappe.db.exists({"doctype": "Tiktok Products", "marketplace_id": product_id})
 
 
 
