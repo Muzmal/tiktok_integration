@@ -137,7 +137,87 @@ class saveTiktokData:
 		
 		
 
+	def _save_sales_invoice(self,o):
+		
+		new_order = frappe.new_doc('Sales Invoice')
+		
+		# new_order.price_list_currency=o['payment_info']['currency']
+		date = o['create_time']
+		date = int(date)/1000
+		date = datetime.utcfromtimestamp(date).strftime('%Y-%m-%d') 
+		new_order.transaction_date=date
+		new_order.delivery_date=date
+		new_order.due_date=today()
+		new_order.customer=o['recipient_address']['name']
+		# new_order.tiktok_order_id=o['order_id']
+		# new_order.marketplace_name="Tiktok"
+		# new_order.marketplace_order_number=o['order_id']
+		# new_order.marketplace="Tiktok"
+		for product in o['item_list']:
+			if( product['seller_sku'] =='' ):
+				product['seller_sku']="no-sku-"+str(product['product_id'])
+			# item_code = product['seller_sku']
+			# Item = frappe.db.exists("Item", str(item_code))
+			# if( Item == None ):
+			# 	self._create_product(product['product_name'],product['seller_sku'],"By-product","no")
+			# 	p_img = self.fetchProduct( product['product_id'],return_image=True )
+			# 	self.saveTiktokProductWebhook(self.orderData)
+			# 	if( p_img ):
+			# 		print(f" Got product image { p_img }")
+			# 		self.addImageToItem(p_img,product['seller_sku'])
+				# tiktok_doc = TiktokwithERPnext()
+				# ifExist=self.checkIfDocExists( product['product_id'] )
+				# if( ifExist == None ):	
+				# 	tiktok_doc.saveTiktokProduct( product )
+			new_order.append("items",{
+				"item_code": product['seller_sku'],
+				"item_name": product['product_name'],
+				"uom": "Kg",
+				"qty": product['quantity'],
+				"price_list_rate": product['sku_original_price'],
+				"rate": product['sku_original_price'],
+				"amount": product['sku_sale_price'],
+				"stock_uom_rate": product['sku_original_price'],
+				"net_rate": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
+				"net_amount": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
+				"billed_amt": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
+				"valuation_rate": product['sku_sale_price']-product['sku_seller_discount']-product['sku_platform_discount_total'],
+				})	
+		p_info=payment_info=o['payment_info']
+		if( 'shipping_fee' in p_info ):
+				
+				# shipping = frappe.db.exists("Item", 'item_shipping_cost')
+				# if( shipping == None ):
+				# 	self._create_product(product['product_name'],product['seller_sku'],"By-product","yes")
+				shipping_provider="Tiktok Shipping"
+				payment_info=o['payment_info']
+				shipping_fee=payment_info['original_shipping_fee']
+				shipping_fee=shipping_fee-payment_info['shipping_fee_platform_discount']
+				shipping_fee=shipping_fee-payment_info['shipping_fee_seller_discount']
 
+				new_order.append("items",{
+				"item_code": 'item_shipping_cost',
+				"item_name": shipping_provider,
+				"uom": "Kg",
+				"qty": "1",
+				"price_list_rate": shipping_fee,
+				"rate": shipping_fee,
+				"amount": shipping_fee,
+				"stock_uom_rate": shipping_fee,
+				"net_rate": shipping_fee,
+				"net_amount": shipping_fee,
+				"billed_amt": shipping_fee,
+				"valuation_rate": shipping_fee,
+				})	
+		response = new_order.insert(
+				ignore_permissions=True, # ignore write permissions during insert
+				ignore_links=True, # ignore Link validation in the document
+				ignore_if_duplicate=True, # dont insert if DuplicateEntryError is thrown
+				ignore_mandatory=True # insert even if mandatory fields are not set
+			)
+		new_order.submit()
+		frappe.db.commit()
+		return
 
 
 	def _save_tiktok_order( self,orders,existingOrder,savedOrder ):
@@ -241,6 +321,7 @@ class saveTiktokData:
 				new_order.save(
 					ignore_permissions=True, # ignore write permissions during insert
 				)
+				new_order.submit()
 				return
 			else :
 				response = new_order.insert(
@@ -249,7 +330,10 @@ class saveTiktokData:
 				ignore_if_duplicate=True, # dont insert if DuplicateEntryError is thrown
 				ignore_mandatory=True # insert even if mandatory fields are not set
 			)
-			new_order.submit()
+				new_order.submit()
+				self._save_sales_invoice(o)
+			
+
 			
 			frappe.msgprint("Created order")
 		return

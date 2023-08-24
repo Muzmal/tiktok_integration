@@ -139,6 +139,7 @@ class handleTiktokRequests:
 			)
 			new_order.submit()
 			frappe.db.commit()
+			save_order_class._save_sales_invoice(o)
 			# frappe.msgprint("Created order")
 			self.added_orders=self.added_orders+1
 		return
