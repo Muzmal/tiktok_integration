@@ -396,6 +396,7 @@ class handleTiktokRequests:
 			for product in products['products']:
 				ifExist=self.checkIfDocExists( product['id'] )
 				if( ifExist == None ):	
+					return product['id']
 					tiktokProduct=save_data.fetchProduct( product['id'],False )
 					self.saveTiktokProduct( tiktokProduct )
 					
