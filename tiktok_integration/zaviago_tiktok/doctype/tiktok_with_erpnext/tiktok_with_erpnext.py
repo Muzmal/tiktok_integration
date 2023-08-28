@@ -87,6 +87,7 @@ class handleTiktokRequests:
 							print(f" Got product image { p_img }")
 							save_order_class.addImageToItem(p_img,product['seller_sku'])
 					ifExist=self.checkIfDocExists( product['product_id'] )
+					return str(product['product_id']) + "test"
 					if( ifExist == None ):	
 						self.saveTiktokProduct( product )
 					
