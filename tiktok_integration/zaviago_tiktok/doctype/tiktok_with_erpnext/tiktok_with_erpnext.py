@@ -390,13 +390,13 @@ class handleTiktokRequests:
 		response = requests.request("POST", url, headers=headers, data=payload)
 		data = response.json()
 		products= data['data']
-		
+		return products
 		if( data['code']==0 ):
 			save_data = saveTiktokData()
 			for product in products['products']:
 				ifExist=self.checkIfDocExists( product['id'] )
 				if( ifExist == None ):	
-					return product['id']
+					
 					tiktokProduct=save_data.fetchProduct( product['id'],False )
 					self.saveTiktokProduct( tiktokProduct )
 					
