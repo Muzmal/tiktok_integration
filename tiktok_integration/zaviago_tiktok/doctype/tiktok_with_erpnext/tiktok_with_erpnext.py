@@ -351,19 +351,11 @@ class handleTiktokRequests:
 
 	def fetchProducts( self ):
 		path='/api/products/search'
-		str =  "testing"
-		return str
 		app_details = frappe.get_doc('Tiktok with ERPnext')
-		str = str +" testing1 "
 		access_token = app_details.get_password('access_token')
-		str = str +" testing2 "
 		app_secret = app_details.get_password('app_secret')
-		str = str +" testing3 "
 		gmt = time.gmtime()
-		str = str +" testing4 "
 		timestamp = calendar.timegm(gmt)    
-		str = str +" testing5 "
-		
 		query = {
 			"app_key":app_details.app_key,
 			'access_token':access_token,
