@@ -87,7 +87,7 @@ class saveTiktokData:
 	
 
 	def fetchProduct( self,product_id,return_image ):
-		return "test"
+		
 		imgUrl=False
 		path='/api/products/details'
 		app_details = frappe.get_doc('Tiktok with ERPnext') 
