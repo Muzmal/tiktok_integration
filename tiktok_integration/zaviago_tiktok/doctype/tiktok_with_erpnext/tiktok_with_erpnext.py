@@ -390,9 +390,10 @@ class handleTiktokRequests:
 		'Content-Type': 'application/json'
 		}
 		response = requests.request("POST", url, headers=headers, data=payload)
-		return response
-		raise Exception()
+		
 		data = response.json()
+		return data
+		raise Exception()
 		products= data['data']
 		
 		if( data['code']==0 ):
