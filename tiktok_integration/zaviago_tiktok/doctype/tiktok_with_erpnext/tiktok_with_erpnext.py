@@ -367,7 +367,7 @@ class handleTiktokRequests:
 			'access_token':access_token,
 			'timestamp':timestamp,
 		}
-		return query
+		
 		params_for_sign = query
 		del params_for_sign['access_token']
 		##################################
@@ -388,6 +388,7 @@ class handleTiktokRequests:
 		'Content-Type': 'application/json'
 		}
 		response = requests.request("POST", url, headers=headers, data=payload)
+		return response
 		data = response.json()
 		products= data['data']
 		
