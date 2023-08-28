@@ -388,7 +388,6 @@ class handleTiktokRequests:
 		'Content-Type': 'application/json'
 		}
 		response = requests.request("POST", url, headers=headers, data=payload)
-		return response
 		data = response.json()
 		products= data['data']
 		
