@@ -120,7 +120,7 @@ class saveTiktokData:
 		}
 		res = requests.get(url, headers=headers, data=payload )
 		data = res.json()
-		 return data
+		return data
 		if( return_image==True ):
 			if( data['code'] == 0 ):
 				img = data['data']
