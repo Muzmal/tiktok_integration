@@ -413,7 +413,7 @@ class handleTiktokRequests:
 	
 	def saveTiktokProduct( self,tiktokProduct ):
 		# print("product does not Exist")
-		
+		tiktokProduct=''
 		#start adding product in tiktok doctype
 		new_product = frappe.new_doc('Tiktok Products')
 		k = 0
@@ -492,6 +492,7 @@ class handleTiktokRequests:
 			ignore_if_duplicate=True, # dont insert if DuplicateEntryError is thrown
 			ignore_mandatory=True # insert even if mandatory fields are not set
 		)
+		
 		frappe.db.commit()
 		# if( seller_sku=='' ):
 		# 	seller_sku="no-sku-"+str(tiktokProduct['product_id'])
