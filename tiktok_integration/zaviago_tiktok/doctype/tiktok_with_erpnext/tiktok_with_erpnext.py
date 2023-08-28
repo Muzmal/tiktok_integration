@@ -394,13 +394,13 @@ class handleTiktokRequests:
 		
 		if( data['code']==0 ):
 			save_data = saveTiktokData()
-			return products['products']
-			raise Exception(products['products'])
 			for product in products['products']:
 				ifExist=self.checkIfDocExists( product['id'] )
 				if( ifExist == None ):	
 					tiktokProduct=save_data.fetchProduct( product['id'],False )
 					self.saveTiktokProduct( tiktokProduct )
+					return  product['id']
+					raise Exception(  product['id'] )
 				
 					
 		else:
