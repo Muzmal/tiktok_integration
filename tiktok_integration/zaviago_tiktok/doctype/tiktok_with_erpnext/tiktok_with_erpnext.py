@@ -492,6 +492,7 @@ class handleTiktokRequests:
 			ignore_if_duplicate=True, # dont insert if DuplicateEntryError is thrown
 			ignore_mandatory=True # insert even if mandatory fields are not set
 		)
+		frappe.db.commit()
 		# if( seller_sku=='' ):
 		# 	seller_sku="no-sku-"+str(tiktokProduct['product_id'])
 		# Item = frappe.db.exists("Item", str(seller_sku))
