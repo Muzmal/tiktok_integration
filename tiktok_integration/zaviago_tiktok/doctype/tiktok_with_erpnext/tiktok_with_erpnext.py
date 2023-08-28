@@ -362,6 +362,7 @@ class handleTiktokRequests:
 			'access_token':access_token,
 			'timestamp':timestamp,
 		}
+		return query
 		params_for_sign = query
 		del params_for_sign['access_token']
 		##################################
