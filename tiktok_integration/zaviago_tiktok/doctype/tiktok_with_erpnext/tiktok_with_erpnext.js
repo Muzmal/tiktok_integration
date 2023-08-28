@@ -92,12 +92,6 @@ frappe.ui.form.on('Tiktok with ERPnext', {
 			freeze_message: "Fetching Products...",
 			
 		}); 
-	}
-	// }
-	// enable_tiktok: function (frm){
-	// 	frm.add_custom_button("Create Connection",()=>{
-	// 		frappe.msgprint("Clicked");	
-	// 		// frm.doc.enable_tiktok
-	// 	})
-	// }
+	},
+
 });
