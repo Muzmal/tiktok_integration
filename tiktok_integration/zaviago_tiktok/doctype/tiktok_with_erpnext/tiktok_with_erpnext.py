@@ -383,7 +383,7 @@ class handleTiktokRequests:
 			'page_number':1,
 			"page_size": 50
 		}
-		return {query,json_params}
+		
 		payload = json.dumps( json_params )
 		headers = {
 		'Content-Type': 'application/json'
@@ -391,7 +391,7 @@ class handleTiktokRequests:
 		response = requests.request("POST", url, headers=headers, data=payload)
 		data = response.json()
 		products= data['data']
-		return {query,json_params,products}
+		
 		if( data['code']==0 ):
 			save_data = saveTiktokData()
 			for product in products['products']:
