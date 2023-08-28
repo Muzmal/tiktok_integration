@@ -89,9 +89,7 @@ frappe.ui.form.on('Tiktok with ERPnext', {
 			method: "tiktok_integration.zaviago_tiktok.doctype.tiktok_with_erpnext.tiktok_with_erpnext.ajax_init_fetch_products",
 			type: "POST",
 			args: {},
-			success: function(r) {
-				frappe.msgprint("Please sss")
-			},
+			success: function(r) {},
 			error: function(r) {},
 			always: function(r) {},
 			freeze: true,
