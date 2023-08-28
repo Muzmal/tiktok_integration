@@ -401,8 +401,8 @@ class handleTiktokRequests:
 				ifExist=self.checkIfDocExists( product['id'] )
 				if( ifExist == None ):	
 					tiktokProduct=save_data.fetchProduct( product['id'],False )
-					# self.saveTiktokProduct( tiktokProduct )
-					return tiktokProduct
+					self.saveTiktokProduct( tiktokProduct )
+					
 
 				
 					
@@ -492,11 +492,11 @@ class handleTiktokRequests:
 			ignore_if_duplicate=True, # dont insert if DuplicateEntryError is thrown
 			ignore_mandatory=True # insert even if mandatory fields are not set
 		)
-		if( seller_sku=='' ):
-			seller_sku="no-sku-"+str(tiktokProduct['product_id'])
-		Item = frappe.db.exists("Item", str(seller_sku))
-		if( Item == None ):
-			self.create_product(tiktokProduct['product_name'],seller_sku,"By-product","no")
+		# if( seller_sku=='' ):
+		# 	seller_sku="no-sku-"+str(tiktokProduct['product_id'])
+		# Item = frappe.db.exists("Item", str(seller_sku))
+		# if( Item == None ):
+		# 	self.create_product(tiktokProduct['product_name'],seller_sku,"By-product","no")
 		return True
 
 	def checkIfDocExists( self,product_id ):
