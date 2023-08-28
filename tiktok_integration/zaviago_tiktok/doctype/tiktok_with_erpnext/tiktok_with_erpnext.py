@@ -486,7 +486,7 @@ class handleTiktokRequests:
 		# new_product.create_discount_campaign=tiktokProduct['product_id']
 
 		new_product.long_description=description
-		new_product.save(
+		new_product.insert(
 			ignore_permissions=True, # ignore write permissions during insert
 			ignore_links=True, # ignore Link validation in the document
 			ignore_if_duplicate=True, # dont insert if DuplicateEntryError is thrown
