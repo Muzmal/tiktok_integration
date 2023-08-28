@@ -402,7 +402,9 @@ class handleTiktokRequests:
 				
 				if( ifExist == None ):	
 					tiktokProduct=save_data.fetchProduct( product['id'],False )
-					self.saveTiktokProduct( tiktokProduct )
+					return tiktokProduct
+					break
+					# self.saveTiktokProduct( tiktokProduct )
 					
 
 				
