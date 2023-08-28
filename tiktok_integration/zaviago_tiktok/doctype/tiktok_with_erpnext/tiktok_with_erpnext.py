@@ -404,12 +404,13 @@ class handleTiktokRequests:
 					
 		else:
 			print(f"\n\n {response} ")
+		return  tiktokProduct
+		raise Exception(  tiktokProduct )
 		return
 		
 	
 	def saveTiktokProduct( self,tiktokProduct ):
-		return  tiktokProduct
-		raise Exception(  tiktokProduct )
+		
 		print("product does not Exist")
 		#start adding product in tiktok doctype
 		new_product = frappe.new_doc('Tiktok Products')
