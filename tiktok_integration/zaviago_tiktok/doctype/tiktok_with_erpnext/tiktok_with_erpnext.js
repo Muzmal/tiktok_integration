@@ -86,14 +86,11 @@ frappe.ui.form.on('Tiktok with ERPnext', {
 		frappe.call({
 			method: "tiktok_integration.zaviago_tiktok.doctype.tiktok_with_erpnext.tiktok_with_erpnext.ajax_init_fetch_products",
 			type: "POST",
-			args: {},
-			always: function(r) {},
 			freeze: true,
 			freeze_message: "Fetching Products...",
 			callback:function(r){
-				console.log( r )
-
-			},
+				console.log("called1")
+			}
 			
 		}); 
 	},
