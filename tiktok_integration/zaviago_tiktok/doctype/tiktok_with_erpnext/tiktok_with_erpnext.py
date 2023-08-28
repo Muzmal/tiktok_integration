@@ -350,18 +350,25 @@ class handleTiktokRequests:
 	
 
 	def fetchProducts( self ):
+		str = "test"
 		path='/api/products/search'
+		str = str +  " 1 "
 		app_details = frappe.get_doc('Tiktok with ERPnext')
+		str = str +  " 2 "
 		access_token = app_details.get_password('access_token')
+		str = str +  " 3 "
 		app_secret = app_details.get_password('app_secret')
+		str = str +  " 4 "
 		gmt = time.gmtime()
+		str = str +  " 5 "
 		timestamp = calendar.timegm(gmt)    
+		str = str +  " 6 "
 		query = {
 			"app_key":app_details.app_key,
 			'access_token':access_token,
 			'timestamp':timestamp,
 		}
-		
+		return str
 		params_for_sign = query
 		del params_for_sign['access_token']
 		##################################
@@ -516,10 +523,7 @@ def ajax_init_fetch_products():
 	app_details = frappe.get_doc('Tiktok with ERPnext')
 	if( app_details.enable_tiktok == True ):
 		tiktok = handleTiktokRequests()
-		str = "test"
-		tiktok.fetchProducts()
-		str=str+"1"
-		return str
+		return ( tiktok.fetchProducts() )
 	else:
 		frappe.throw("Please Enable Tiktok to start fetching products")
 	return
