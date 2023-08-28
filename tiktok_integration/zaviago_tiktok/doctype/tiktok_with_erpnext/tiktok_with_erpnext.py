@@ -108,7 +108,8 @@ class handleTiktokRequests:
 				p_info=payment_info=o['payment_info']
 				if( 'shipping_fee' in p_info ):
 					shipping = frappe.db.exists("Item", str('item_shipping_cost'))
-					if( shipping == None ):
+					if( shipping == None ):	
+		
 						self.create_product(product['product_name'],product['seller_sku'],"By-product","yes")
 					shipping_provider="Tiktok Shipping"
 					payment_info=o['payment_info']
