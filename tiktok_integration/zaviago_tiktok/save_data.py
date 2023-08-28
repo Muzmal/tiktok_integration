@@ -106,6 +106,7 @@ class saveTiktokData:
 				'timestamp':timestamp,
 				'product_id':str(product_id)
 			}
+		return query
 		params_for_sign = query
 		del params_for_sign['access_token']
 		tiktok = saveTiktokData()
@@ -120,7 +121,6 @@ class saveTiktokData:
 		}
 		res = requests.get(url, headers=headers, data=payload )
 		data = res.json()
-		return data
 		if( return_image==True ):
 			if( data['code'] == 0 ):
 				img = data['data']
