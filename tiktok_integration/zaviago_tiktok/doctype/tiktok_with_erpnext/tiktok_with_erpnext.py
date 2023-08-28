@@ -516,7 +516,10 @@ def ajax_init_fetch_products():
 	app_details = frappe.get_doc('Tiktok with ERPnext')
 	if( app_details.enable_tiktok == True ):
 		tiktok = handleTiktokRequests()
+		str = "test"
 		tiktok.fetchProducts()
+		str=str+"1"
+		return str
 	else:
 		frappe.throw("Please Enable Tiktok to start fetching products")
 	return
