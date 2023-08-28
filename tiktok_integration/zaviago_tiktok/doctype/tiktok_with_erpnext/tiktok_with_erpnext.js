@@ -91,7 +91,7 @@ frappe.ui.form.on('Tiktok with ERPnext', {
 			freeze: true,
 			freeze_message: "Fetching Products...",
 			callback:function(r){
-				console.log("called")
+				console.log( r )
 
 			},
 			
