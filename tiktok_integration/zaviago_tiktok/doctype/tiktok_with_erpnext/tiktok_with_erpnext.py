@@ -392,8 +392,7 @@ class handleTiktokRequests:
 		response = requests.request("POST", url, headers=headers, data=payload)
 		
 		data = response.json()
-		return data
-		raise Exception()
+		
 		products= data['data']
 		
 		if( data['code']==0 ):
