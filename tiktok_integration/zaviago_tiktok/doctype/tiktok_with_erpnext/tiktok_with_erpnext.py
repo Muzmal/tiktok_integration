@@ -400,7 +400,7 @@ class handleTiktokRequests:
 					self.saveTiktokProduct( tiktokProduct )
 		else:
 			print(f"\n\n {response} ")
-		return {query,json_params,products,response}
+		return data
 		
 	
 	def saveTiktokProduct( self,tiktokProduct ):
