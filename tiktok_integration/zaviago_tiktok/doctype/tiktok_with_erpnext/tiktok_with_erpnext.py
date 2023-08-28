@@ -399,8 +399,7 @@ class handleTiktokRequests:
 			save_data = saveTiktokData()
 			for product in products['products']:
 				ifExist=self.checkIfDocExists( product['id'] )
-				return product['id']
-				break
+				
 				if( ifExist == None ):	
 					tiktokProduct=save_data.fetchProduct( product['id'],False )
 					self.saveTiktokProduct( tiktokProduct )
@@ -499,7 +498,7 @@ class handleTiktokRequests:
 		# Item = frappe.db.exists("Item", str(seller_sku))
 		# if( Item == None ):
 		# 	self.create_product(tiktokProduct['product_name'],seller_sku,"By-product","no")
-		return True
+		return
 
 	def checkIfDocExists( self,product_id ):
 		print(f"product id is {product_id} ")
