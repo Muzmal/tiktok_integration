@@ -404,8 +404,6 @@ class handleTiktokRequests:
 					
 		else:
 			print(f"\n\n {response} ")
-		return  tiktokProduct
-		raise Exception(  tiktokProduct )
 		return
 		
 	
