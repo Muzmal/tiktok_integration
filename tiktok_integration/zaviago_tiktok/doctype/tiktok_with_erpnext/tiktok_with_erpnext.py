@@ -409,7 +409,8 @@ class handleTiktokRequests:
 		
 	
 	def saveTiktokProduct( self,tiktokProduct ):
-		
+		return tiktokProduct
+		raise Exception("test")
 		print("product does not Exist")
 		#start adding product in tiktok doctype
 		new_product = frappe.new_doc('Tiktok Products')
@@ -489,8 +490,8 @@ class handleTiktokRequests:
 		if( seller_sku=='' ):
 			seller_sku="no-sku-"+str(tiktokProduct['product_id'])
 		Item = frappe.db.exists("Item", str(seller_sku))
-		# if( Item == None ):
-		# 	self.create_product(tiktokProduct['product_name'],seller_sku,"By-product","no")
+		if( Item == None ):
+			self.create_product(tiktokProduct['product_name'],seller_sku,"By-product","no")
 		return True
 
 	def checkIfDocExists( self,product_id ):
