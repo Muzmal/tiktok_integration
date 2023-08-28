@@ -87,8 +87,7 @@ class saveTiktokData:
 	
 
 	def fetchProduct( self,product_id,return_image ):
-		print( 'product_id' )
-		print(product_id)
+		return "test"
 		imgUrl=False
 		path='/api/products/details'
 		app_details = frappe.get_doc('Tiktok with ERPnext') 
@@ -106,7 +105,7 @@ class saveTiktokData:
 				'timestamp':timestamp,
 				'product_id':str(product_id)
 			}
-		return query
+		
 		params_for_sign = query
 		del params_for_sign['access_token']
 		tiktok = saveTiktokData()
