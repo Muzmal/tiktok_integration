@@ -1,0 +1,249 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:product_name",
+ "creation": "2023-09-12 10:07:30.741864",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_name1",
+  "product_name",
+  "copy_item_detail_from_master",
+  "section_break_gkv79",
+  "stock_keeping_unit_sku",
+  "item_name",
+  "item_group",
+  "route",
+  "has_variants",
+  "variant_of",
+  "column_break_mu7ni",
+  "tiktok_shop_item_name",
+  "tiktok_product_categories",
+  "image_and_video_section",
+  "profile_image_src",
+  "video",
+  "column_break_tal8r",
+  "item_status_section",
+  "active_product",
+  "column_break_1diul",
+  "cash_on_delivery_cod",
+  "detail_section",
+  "brand",
+  "product_price",
+  "stock_piece",
+  "column_break_u2tdf",
+  "item_dimension_section",
+  "width_cm",
+  "column_break_vlqci",
+  "length_cm",
+  "column_break_3ejj0",
+  "height_cm",
+  "section_break_5bwx1",
+  "weight_kg",
+  "marketplace_id"
+ ],
+ "fields": [
+  {
+   "fieldname": "product_name",
+   "fieldtype": "Data",
+   "label": "Naming Series",
+   "unique": 1
+  },
+  {
+   "fieldname": "copy_item_detail_from_master",
+   "fieldtype": "Button",
+   "label": "Copy item detail from 'Master'"
+  },
+  {
+   "fieldname": "section_break_gkv79",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Item Name"
+  },
+  {
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "label": "Item Group",
+   "options": "Item Group"
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Small Text",
+   "label": "Route"
+  },
+  {
+   "default": "0",
+   "fieldname": "has_variants",
+   "fieldtype": "Check",
+   "label": "Has Variants"
+  },
+  {
+   "fieldname": "variant_of",
+   "fieldtype": "Link",
+   "label": "Variant Of",
+   "options": "Item"
+  },
+  {
+   "fieldname": "column_break_mu7ni",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tiktok_shop_item_name",
+   "fieldtype": "Data",
+   "label": "TikTok Shop Item Name"
+  },
+  {
+   "fieldname": "image_and_video_section",
+   "fieldtype": "Section Break",
+   "label": "Image and Video"
+  },
+  {
+   "fieldname": "video",
+   "fieldtype": "Attach",
+   "label": "Video"
+  },
+  {
+   "fieldname": "column_break_tal8r",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "item_status_section",
+   "fieldtype": "Section Break",
+   "label": "Item Status"
+  },
+  {
+   "default": "0",
+   "fieldname": "active_product",
+   "fieldtype": "Check",
+   "label": "Active Product?"
+  },
+  {
+   "fieldname": "column_break_1diul",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "cash_on_delivery_cod",
+   "fieldtype": "Check",
+   "label": "Cash on Delivery (COD)"
+  },
+  {
+   "fieldname": "detail_section",
+   "fieldtype": "Section Break",
+   "label": "Detail"
+  },
+  {
+   "fieldname": "brand",
+   "fieldtype": "Autocomplete",
+   "label": "Brand"
+  },
+  {
+   "fieldname": "stock_piece",
+   "fieldtype": "Float",
+   "label": "Stock (piece)"
+  },
+  {
+   "fieldname": "column_break_u2tdf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "item_dimension_section",
+   "fieldtype": "Section Break",
+   "label": "Item Dimension"
+  },
+  {
+   "fieldname": "width_cm",
+   "fieldtype": "Float",
+   "label": "Width (Cm.)"
+  },
+  {
+   "fieldname": "column_break_vlqci",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "length_cm",
+   "fieldtype": "Float",
+   "label": "Length (Cm.)"
+  },
+  {
+   "fieldname": "column_break_3ejj0",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "height_cm",
+   "fieldtype": "Float",
+   "label": "Height (Cm.)"
+  },
+  {
+   "fieldname": "section_break_5bwx1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "weight_kg",
+   "fieldtype": "Float",
+   "label": "Weight (Kg.)"
+  },
+  {
+   "fieldname": "item_name1",
+   "fieldtype": "Data",
+   "label": "Product Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "stock_keeping_unit_sku",
+   "fieldtype": "Link",
+   "label": "Item Code (SKU)",
+   "options": "Item"
+  },
+  {
+   "fieldname": "tiktok_product_categories",
+   "fieldtype": "Autocomplete",
+   "label": "Category Name"
+  },
+  {
+   "fieldname": "profile_image_src",
+   "fieldtype": "Attach",
+   "label": "Image"
+  },
+  {
+   "fieldname": "product_price",
+   "fieldtype": "Currency",
+   "label": "Full Price"
+  },
+  {
+   "fieldname": "marketplace_id",
+   "fieldtype": "Data",
+   "label": "Marketplce ID"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-09-12 14:39:53.346777",
+ "modified_by": "Administrator",
+ "module": "Zaviago Tiktok",
+ "name": "Tiktok Item",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

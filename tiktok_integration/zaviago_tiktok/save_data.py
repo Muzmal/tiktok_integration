@@ -491,7 +491,8 @@ class saveTiktokData:
 		if( self.checkIfDocExistsWebhook( tiktokProduct['product_id'] )==False ):
 			return
 		#start adding product in tiktok doctype
-		new_product = frappe.new_doc('Tiktok Products')
+		# new_product = frappe.new_doc('Tiktok Products')
+		new_product = frappe.new_doc('Tiktok Item')
 		k = 0
 		is_variable=False
 		profileImg=''
@@ -517,11 +518,11 @@ class saveTiktokData:
 
 		if( array_of_images ):
 			del array_of_images[0]
-			for addImg in array_of_images: 	
-				new_product.append('additional_images',{
-					"additional_image_src":addImg[0],
-					"additional_image":addImg[0]
-				})
+			# for addImg in array_of_images: 	
+			# 	new_product.append('additional_images',{
+			# 		"additional_image_src":addImg[0],
+			# 		"additional_image":addImg[0]
+			# 	})
 		description=''
 		if( 'description' in tiktokProduct ):
 			description = tiktokProduct['description']
@@ -561,7 +562,7 @@ class saveTiktokData:
 
 		# new_product.create_discount_campaign=tiktokProduct['product_id']
 
-		new_product.long_description=description
+		# new_product.long_description=description
 		new_product.save(
 			ignore_permissions=True, # ignore write permissions during insert
 		)
@@ -574,7 +575,7 @@ class saveTiktokData:
 
 	def checkIfDocExistsWebhook( self,product_id ):
 		print(f"product id is {product_id} ")
-		return frappe.db.exists({"doctype": "Tiktok Products", "marketplace_id": product_id})
+		return frappe.db.exists({"doctype": "Tiktok Item", "marketplace_id": product_id})
 
 
 
