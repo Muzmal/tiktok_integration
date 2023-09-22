@@ -402,7 +402,7 @@ class handleTiktokRequests:
 				ifExist=self.checkIfDocExists( product['id'] )
 				if( ifExist == None ):	
 					tiktokProduct=save_data.fetchProduct( product['id'],False )
-					if( tiktokProduct ):
+					if( tiktokProduct is not False ):
 						self.saveTiktokProduct( tiktokProduct )
 		else:
 			print(f"\n\n {response} ")
@@ -410,8 +410,10 @@ class handleTiktokRequests:
 		
 	
 	def saveTiktokProduct( self,tiktokProduct ):
+		
 		#start adding product in tiktok doctype
-		if(  frappe.db.exists({"doctype": "Tiktok Item", "marketplace_id": tiktokProduct['product_id']}) == None ):
+		
+		if( 'product_id' in tiktokProduct and frappe.db.exists({"doctype": "Tiktok Item", "marketplace_id": tiktokProduct['product_id']}) == None ):
 			new_product = frappe.new_doc('Tiktok Item')
 			k = 0
 			is_variable=False
