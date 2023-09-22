@@ -32,6 +32,7 @@ class handleTiktokRequests:
 	next_cursor=False
 	limit = 10
 	added_orders=0
+	max_number=0
 	app_details = frappe.get_doc('Tiktok with ERPnext')
 	if( app_details.enable_tiktok == True ):
 		if( app_details.maximum_orders_to_fetch and app_details.maximum_orders_to_fetch<=100 ):
@@ -87,8 +88,8 @@ class handleTiktokRequests:
 							print(f" Got product image { p_img }")
 							save_order_class.addImageToItem(p_img,product['seller_sku'])
 					
-					self.saveTiktokProduct( product )
-					return str(product['product_id']) + "test"
+					self.saveTiktokProduct( save_order_class.orderData )
+					return str(product['product_id'])
 					
 					
 				new_order.append("items",{
@@ -399,14 +400,10 @@ class handleTiktokRequests:
 			save_data = saveTiktokData()
 			for product in products['products']:
 				ifExist=self.checkIfDocExists( product['id'] )
-				
 				if( ifExist == None ):	
 					tiktokProduct=save_data.fetchProduct( product['id'],False )
-					self.saveTiktokProduct( tiktokProduct )
-					
-
-				
-					
+					if( tiktokProduct ):
+						self.saveTiktokProduct( tiktokProduct )
 		else:
 			print(f"\n\n {response} ")
 		return
@@ -503,7 +500,7 @@ class handleTiktokRequests:
 
 	def checkIfDocExists( self,product_id ):
 		print(f"product id is {product_id} ")
-		return frappe.db.exists({"doctype": "Tiktok Products", "marketplace_id": product_id})
+		return frappe.db.exists({"doctype": "Tiktok Item", "marketplace_id": product_id})
 
 		
 

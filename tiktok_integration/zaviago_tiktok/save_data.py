@@ -112,26 +112,33 @@ class saveTiktokData:
 		url = url+path+"?app_key="+str(app_details.app_key)+"&access_token="+str(access_token)+"&sign="+str(signature)+"&timestamp="+str(timestamp)+"&product_id="+str(product_id)
 		payload = json.dumps({
 		#"order_id_list": ['577463955647466245']
-		"product_id": '1729622829106760283'
+		# "product_id": '1729622829106760283'
 		})
 		headers = {
 		'Content-Type': 'application/json'
 		}
-		res = requests.get(url, headers=headers, data=payload )
-		data = res.json()
-		if( return_image==True ):
-			if( data['code'] == 0 ):
-				img = data['data']
-				img = img['images']
-				for i in img:
-					imgUrl = i['thumb_url_list'][0] 
-					break
-			return_value= imgUrl
-		else:
-			return_value = data['data']
-		self.orderData=data['data']
-		print(f" return value is {return_value}")
-		return return_value
+		
+		 
+		try:
+			res = requests.get(url, headers=headers, data=payload )
+			if( res.json() ):
+				data = res.json()
+			if( return_image==True ):
+				if( data['code'] == 0 ):
+					img = data['data']
+					img = img['images']
+					for i in img:
+						imgUrl = i['thumb_url_list'][0] 
+						break
+				return_value= imgUrl
+			else:
+				return_value = data['data']
+			self.orderData=data['data']
+			print(f" return value is {return_value}")
+			return return_value
+		except:
+			return False
+ 		
 		
 		
 
