@@ -495,89 +495,108 @@ class saveTiktokData:
 		return
 
 	def saveTiktokProductWebhook( self,tiktokProduct ):
-		if( self.checkIfDocExistsWebhook( tiktokProduct['product_id'] )==False ):
-			return
 		#start adding product in tiktok doctype
-		# new_product = frappe.new_doc('Tiktok Products')
-		new_product = frappe.new_doc('Tiktok Item')
-		k = 0
-		is_variable=False
-		profileImg=''
-		k = 0
-		cat_local_display_name=''
-		if( 'category_list' in tiktokProduct ):
-			category_list = tiktokProduct['category_list']
-			for i in category_list:
-				print(f" We have found category {i['local_display_name'] }")
-				cat_local_display_name = i['local_display_name']
-				k=k+1
-		new_product.tiktok_product_categories=cat_local_display_name
-		array_of_images=False
-		if( 'images' in tiktokProduct ):
-			images=tiktokProduct['images']
-			k=0
-			array_of_images=[]
-			for i in images:
-				if( k==0 ):
-					profileImg = i['thumb_url_list'][0]
-				array_of_images.append(i['thumb_url_list'])
-				k=k+1
+		
+		if( 'product_id' in tiktokProduct and frappe.db.exists({"doctype": "Tiktok Item", "marketplace_id": tiktokProduct['product_id']}) == None ):
+			new_product = frappe.new_doc('Tiktok Item')
+			k = 0
+			is_variable=False
+			profileImg=''
+			k = 0
+			cat_local_display_name=''
+			if( 'category_list' in tiktokProduct ):
+				category_list = tiktokProduct['category_list']
+				for i in category_list:
+					print(f" We have found category {i['local_display_name'] }")
+					cat_local_display_name = i['local_display_name']
+					k=k+1
+			new_product.tiktok_product_categories=cat_local_display_name
+			array_of_images=False
+			if( 'images' in tiktokProduct ):
+				images=tiktokProduct['images']
+				k=0
+				array_of_images=[]
+				for i in images:
+					if( k==0 ):
+						profileImg = i['thumb_url_list'][0]
+					array_of_images.append(i['thumb_url_list'])
+					k=k+1
 
-		if( array_of_images ):
-			del array_of_images[0]
-			# for addImg in array_of_images: 	
-			# 	new_product.append('additional_images',{
-			# 		"additional_image_src":addImg[0],
-			# 		"additional_image":addImg[0]
-			# 	})
-		description=''
-		if( 'description' in tiktokProduct ):
-			description = tiktokProduct['description']
-		brand_name=''
-		if( 'brand' in tiktokProduct ):
-			brand = tiktokProduct['brand']
-			brand_name=brand['name']
-		seller_sku='...'
-		price=''
-		l=0
-		if( 'skus' in tiktokProduct ):
-			for sku in tiktokProduct['skus']:
-				seller_sku = sku['seller_sku']
-				price = sku['price']
-				price=price['original_price']
-				if( 'sales_attributes' in sku ):
-					sales_attributes = sku['sales_attributes']
-					for j in sales_attributes:
-						l=l+1
-		if( l>1 ):
-			is_variable=True
-			seller_sku=''
-		new_product.has_variants=is_variable
-		new_product.product_name=tiktokProduct['product_name']
-		new_product.erpnext_item_name=tiktokProduct['product_name']
+			if( array_of_images ):
+				del array_of_images[0]
+				# for addImg in array_of_images: 	
+				# 	new_product.append('additional_images',{
+				# 		"additional_image_src":addImg[0],
+				# 		"additional_image":addImg[0]
+				# 	})
+			description=''
+			if( 'description' in tiktokProduct ):
+				description = tiktokProduct['description']
+			brand_name=''
+			if( 'brand' in tiktokProduct ):
+				brand = tiktokProduct['brand']
+				brand_name=brand['name']
+			seller_sku='...'
+			price=''
+			l=0
+			if( 'skus' in tiktokProduct ):
+				for sku in tiktokProduct['skus']:
+					seller_sku = sku['seller_sku']
+					price = sku['price']
+					price=price['original_price']
+					if( 'sales_attributes' in sku ):
+						sales_attributes = sku['sales_attributes']
+						for j in sales_attributes:
+							l=l+1
+			if( l>1 ):
+				is_variable=True
+				seller_sku='...'
+			new_product.has_variants=is_variable
+			if( "package_width" in tiktokProduct ):
+				new_product.width_cm =tiktokProduct['package_width']
+			if( "package_height" in tiktokProduct ):
+				new_product.height_cm =tiktokProduct['package_height']
+			if( "package_length" in tiktokProduct ):
+				new_product.length_cm =tiktokProduct['package_length']
+			if( "package_weight" in tiktokProduct ):
+				new_product.weight_kg =tiktokProduct['package_weight']
+			if( "is_cod_open" in tiktokProduct and tiktokProduct['is_cod_open']==True ):
+				new_product.cash_on_delivery_cod=True
+			
+			 
+			
+			new_product.product_name=tiktokProduct['product_name']
+			new_product.erpnext_item_name=tiktokProduct['product_name']
+			new_product.tiktok_shop_item_name=tiktokProduct['product_name']
 
-		new_product.item_name=tiktokProduct['product_name']
-		new_product.marketplace_id=tiktokProduct['product_id']
-		new_product.brand=brand_name
-		new_product.stock_keeping_unit_sku=seller_sku
-		# new_product.disabled=tiktokProduct['product_id']
-		# new_product.has_variants=tiktokProduct['product_id']
-		new_product.profile_image_src=profileImg
-		# new_product.additional_images=tiktokProduct['product_id']
+			new_product.item_name=tiktokProduct['product_name']
+			new_product.marketplace_id=tiktokProduct['product_id']
+			new_product.brand=brand_name
+			new_product.stock_keeping_unit_sku=seller_sku
+			# new_product.disabled=tiktokProduct['product_id']
+			# new_product.has_variants=tiktokProduct['product_id']
+			new_product.profile_image_src=profileImg
+			# new_product.additional_images=tiktokProduct['product_id']
 
-		new_product.product_price=price
+			new_product.product_price=price
+			new_product.item_group="Tiktok"
 
-		# new_product.create_discount_campaign=tiktokProduct['product_id']
+			# new_product.create_discount_campaign=tiktokProduct['product_id']
 
-		# new_product.long_description=description
-		new_product.save(
-			ignore_permissions=True, # ignore write permissions during insert
-		)
+			# new_product.long_description=description
+			new_product.insert(
+				ignore_permissions=True, # ignore write permissions during insert
+				ignore_links=True, # ignore Link validation in the document
+				ignore_if_duplicate=True, # dont insert if DuplicateEntryError is thrown
+				ignore_mandatory=True # insert even if mandatory fields are not set
+			)
+			
+			frappe.db.commit()
 		if( seller_sku=='' ):
 			seller_sku="no-sku-"+str(tiktokProduct['product_id'])
 		Item = frappe.db.exists("Item", str(seller_sku))
 		if( Item == None ):
-			self.create_product(tiktokProduct['product_name'],seller_sku,"By-product","no")
+			self._create_product(tiktokProduct['product_name'],seller_sku,"By-product","no")
 		return True
 
 	def checkIfDocExistsWebhook( self,product_id ):

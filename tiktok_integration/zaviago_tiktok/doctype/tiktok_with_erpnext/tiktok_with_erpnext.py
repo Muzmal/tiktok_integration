@@ -209,13 +209,14 @@ class handleTiktokRequests:
 		frappe.db.commit()
 
 	def create_product(self,item_name,item_code,item_group,is_shipping):
-		item_group="Tiktok"
+		
 		if( is_shipping=='yes' ):
 			item_name='shipping'
 			item_code='item_shipping_cost'
 		item = frappe.new_doc('Item')
 		item.item_name=item_name
 		item.item_code=item_code
+		item_group="Tiktok"
 		item_group = frappe.db.exists("Item Group", item_group )
 		if( item_group == None ):
 			print( f"  \n \n \n \n  Creating item group   \n \n \n \n ")
@@ -466,10 +467,24 @@ class handleTiktokRequests:
 							l=l+1
 			if( l>1 ):
 				is_variable=True
-				seller_sku=''
+				seller_sku='...'
 			new_product.has_variants=is_variable
+			if( "package_width" in tiktokProduct ):
+				new_product.width_cm =tiktokProduct['package_width']
+			if( "package_height" in tiktokProduct ):
+				new_product.height_cm =tiktokProduct['package_height']
+			if( "package_length" in tiktokProduct ):
+				new_product.length_cm =tiktokProduct['package_length']
+			if( "package_weight" in tiktokProduct ):
+				new_product.weight_kg =tiktokProduct['package_weight']
+			if( "is_cod_open" in tiktokProduct and tiktokProduct['is_cod_open']==True ):
+				new_product.cash_on_delivery_cod=True
+			
+			 
+			
 			new_product.product_name=tiktokProduct['product_name']
 			new_product.erpnext_item_name=tiktokProduct['product_name']
+			new_product.tiktok_shop_item_name=tiktokProduct['product_name']
 
 			new_product.item_name=tiktokProduct['product_name']
 			new_product.marketplace_id=tiktokProduct['product_id']
@@ -481,6 +496,7 @@ class handleTiktokRequests:
 			# new_product.additional_images=tiktokProduct['product_id']
 
 			new_product.product_price=price
+			new_product.item_group="Tiktok"
 
 			# new_product.create_discount_campaign=tiktokProduct['product_id']
 
