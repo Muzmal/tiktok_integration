@@ -1,7 +1,7 @@
 # Copyright (c) 2023, Zaviago and contributors
 # For license information, please see license.txt
 
-import frappe
+import frappe 
 from frappe.model.document import Document
 import requests
 from tiktok_integration.zaviago_tiktok.create_client import CreateTiktokClient
