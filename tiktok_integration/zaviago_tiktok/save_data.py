@@ -36,6 +36,86 @@ class saveTiktokData:
 		else:
 			return False
 	
+	def create_webItem(self,item_code,tiktokProduct):
+		webItem=frappe.new_doc("Website Item")
+		webItem.name=item_code
+		
+		webItem.web_item_name=item_code
+		if( "product_status" in tiktokProduct ):
+			if( tiktokProduct['product_status'] == 5 ):
+				webItem.published=False
+		webItem.item_code=item_code
+		webItem.item_name=tiktokProduct['product_name']
+		webItem.item_group="Tiktok"
+		description=''
+		if( 'description' in tiktokProduct ):
+			description = tiktokProduct['description']
+		webItem.description=description
+
+		brand_name=''
+		if( 'brand' in tiktokProduct ):
+			brand = tiktokProduct['brand']
+			brand_name=brand['name']
+			webItem.brand=brand_name
+
+		l=0
+		is_variable=False
+		if( 'skus' in tiktokProduct ):
+			for sku in tiktokProduct['skus']:
+				seller_sku = sku['seller_sku']
+				price = sku['price']
+				price=price['original_price']
+				if( 'sales_attributes' in sku ):
+					sales_attributes = sku['sales_attributes']
+					for j in sales_attributes:
+						l=l+1
+		if( l>1 ):
+			is_variable=True
+		webItem.has_variants=is_variable
+
+		array_of_images=False
+		if( 'images' in tiktokProduct ):
+			images=tiktokProduct['images']
+			k=0
+			array_of_images=[]
+			for i in images:
+				if( k==0 ):
+					profileImg = i['thumb_url_list'][0]
+				array_of_images.append(i['thumb_url_list'])
+				k=k+1
+
+		if( array_of_images ):
+			del array_of_images[0]
+			# for addImg in array_of_images: 	
+			# 	new_product.append('additional_images',{
+			# 		"additional_image_src":addImg[0],
+			# 		"additional_image":addImg[0]
+			# 	})
+		webItem.profileImg=profileImg
+
+		
+
+		webItem.short_description=description
+		webItem.web_long_description=description
+		webItem.insert(
+			ignore_permissions=True, # ignore write permissions during insert
+			ignore_links=True, # ignore Link validation in the document
+			ignore_mandatory=True # insert even if mandatory fields are not set
+		)
+		image_name = self.addImageToItem(profileImg,webItem.name)
+		print(f"image is {image_name}" )
+		if( image_name is not None ):
+			img_name = "_photo.jpeg"
+			uploaded_img = frappe.get_doc("File",image_name)
+			if( uploaded_img is not None ):
+				uploaded_img.attached_to_doctype="Website Item"
+				uploaded_img.attached_to_name=webItem.name
+				uploaded_img.save()
+				webItem.website_image=str(item_code)+"_photo.jpeg"
+				webItem.save()
+		frappe.db.commit()
+		return
+	
 
 	def _fetchOrderDetails(self,orderIDs,isNew):
 		############################### get order details
@@ -492,7 +572,7 @@ class saveTiktokData:
 				ignore_permissions=True, # ignore write permissions during insert
 				ignore_links=True, )
 		frappe.db.commit()
-		return
+		return new_file.name
 
 	def saveTiktokProductWebhook( self,tiktokProduct ):
 		#start adding product in tiktok doctype
@@ -597,6 +677,10 @@ class saveTiktokData:
 		Item = frappe.db.exists("Item", str(seller_sku))
 		if( Item == None ):
 			self._create_product(tiktokProduct['product_name'],seller_sku,"By-product","no")
+		webItem = frappe.db.exists( "Website Item" , {"web_item_name": seller_sku})
+		save_data = saveTiktokData()
+		if( webItem == None ):
+			self.create_webItem( seller_sku,tiktokProduct )
 		return True
 
 	def checkIfDocExistsWebhook( self,product_id ):

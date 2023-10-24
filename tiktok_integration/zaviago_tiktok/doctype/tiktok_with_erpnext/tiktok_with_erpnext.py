@@ -278,6 +278,11 @@ class handleTiktokRequests:
 		}
 		response = requests.request("POST", url, headers=headers, data=payload)
 		data = response.json()
+		if( 'code' in data and data['message'] != "Success"):
+			frappe.msgprint(data['message'])
+			return
+		
+
 		if( data['code']==0 ):
 			print(f"\n\n {data['data']} ")
 			order_list=[]
@@ -394,8 +399,12 @@ class handleTiktokRequests:
 		response = requests.request("POST", url, headers=headers, data=payload)
 		
 		data = response.json()
-		
-		products= data['data']
+		print(data)
+		if( 'code' in data and data['message'] != "Success"):
+			frappe.msgprint(data['message'])
+			return
+		if( 'data' in data ):
+			products= data['data']
 		
 		if( data['code']==0 ):
 			save_data = saveTiktokData()
@@ -405,13 +414,15 @@ class handleTiktokRequests:
 					tiktokProduct=save_data.fetchProduct( product['id'],False )
 					if( tiktokProduct is not False ):
 						self.saveTiktokProduct( tiktokProduct )
+						
 		else:
 			print(f"\n\n {response} ")
 		return
 		
 	
 	def saveTiktokProduct( self,tiktokProduct ):
-		
+		# print(tiktokProduct)
+		# return
 		#start adding product in tiktok doctype
 		
 		if( 'product_id' in tiktokProduct and frappe.db.exists({"doctype": "Tiktok Item", "marketplace_id": tiktokProduct['product_id']}) == None ):
@@ -509,11 +520,15 @@ class handleTiktokRequests:
 			)
 			
 			frappe.db.commit()
-			if( seller_sku=='' ):
+			if( seller_sku=='' or  seller_sku == '...' ):
 				seller_sku="no-sku-"+str(tiktokProduct['product_id'])
 			Item = frappe.db.exists("Item", str(seller_sku))
 			if( Item == None ):
 				self.create_product(tiktokProduct['product_name'],seller_sku,"By-product","no")
+			webItem = frappe.db.exists( "Website Item" , {"web_item_name": seller_sku})
+			save_data = saveTiktokData()
+			if( webItem == None ):
+				save_data.create_webItem( seller_sku,tiktokProduct )
 		return
 
 	def checkIfDocExists( self,product_id ):

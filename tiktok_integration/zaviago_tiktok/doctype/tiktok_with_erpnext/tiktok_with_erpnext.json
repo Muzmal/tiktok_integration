@@ -56,7 +56,7 @@
   {
    "fieldname": "start_connection",
    "fieldtype": "Button",
-   "label": "Start Connection"
+   "label": "Start Connection/Refresh Connection"
   },
   {
    "fieldname": "fetch_orders",
@@ -90,7 +90,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-08-08 12:55:53.403754",
+ "modified": "2023-10-20 11:17:07.624851",
  "modified_by": "Administrator",
  "module": "Zaviago Tiktok",
  "name": "Tiktok with ERPnext",
@@ -108,5 +108,6 @@
   }
  ],
  "sort_field": "modified",
- "sort_order": "DESC"
+ "sort_order": "DESC",
+ "states": []
 }
