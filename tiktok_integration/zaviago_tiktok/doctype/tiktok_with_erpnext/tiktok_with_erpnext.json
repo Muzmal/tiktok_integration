@@ -17,7 +17,9 @@
   "actions_section",
   "fetch_orders",
   "column_break_mxrjz",
-  "fetch_products"
+  "fetch_products",
+  "column_break_n1ycd",
+  "sync_categories"
  ],
  "fields": [
   {
@@ -85,12 +87,21 @@
    "label": "Maximum Orders to fetch",
    "non_negative": 1,
    "reqd": 1
+  },
+  {
+   "fieldname": "column_break_n1ycd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sync_categories",
+   "fieldtype": "Button",
+   "label": "Sync Categories"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-10-20 11:17:07.624851",
+ "modified": "2023-10-24 09:59:34.086324",
  "modified_by": "Administrator",
  "module": "Zaviago Tiktok",
  "name": "Tiktok with ERPnext",

@@ -191,8 +191,6 @@ class saveTiktokData:
 		signature = tiktok._getSignature(path,params_for_sign,app_secret)
 		url = url+path+"?app_key="+str(app_details.app_key)+"&access_token="+str(access_token)+"&sign="+str(signature)+"&timestamp="+str(timestamp)+"&product_id="+str(product_id)
 		payload = json.dumps({
-		#"order_id_list": ['577463955647466245']
-		# "product_id": '1729622829106760283'
 		})
 		headers = {
 		'Content-Type': 'application/json'

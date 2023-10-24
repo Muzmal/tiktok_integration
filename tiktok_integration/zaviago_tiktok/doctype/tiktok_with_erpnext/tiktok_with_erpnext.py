@@ -534,8 +534,7 @@ class handleTiktokRequests:
 	def checkIfDocExists( self,product_id ):
 		print(f"product id is {product_id} ")
 		return frappe.db.exists({"doctype": "Tiktok Item", "marketplace_id": product_id})
-
-		
+	
 
 @frappe.whitelist( )
 def ajax_init_fetch_orders():
@@ -562,6 +561,18 @@ def ajax_init_fetch_orders():
 	else:
 		frappe.throw("Please Enable Tiktok to start fetching orders")
 	return
+
+	
+
+@frappe.whitelist( )
+# def sync_cats():
+# 	app_details = frappe.get_doc('Tiktok with ERPnext')
+# 	if( app_details.enable_tiktok == True ):
+# 		tiktok = handleTiktokRequests()
+# 		tiktok.fetch_categories()
+# 	else:
+# 		frappe.throw("Please Enable Tiktok to start fetching categories")
+# 	return 
 
 @frappe.whitelist( )
 def ajax_init_fetch_products():

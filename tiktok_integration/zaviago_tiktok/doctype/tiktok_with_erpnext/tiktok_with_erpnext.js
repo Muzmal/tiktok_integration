@@ -93,6 +93,44 @@ frappe.ui.form.on('Tiktok with ERPnext', {
 			}
 			
 		}); 
+	},sync_categories:function(frm){
+		if( !frm.doc.enable_tiktok){
+			frappe.msgprint("Please enable tiktok api")
+			return
+		}
+		if( frm.doc.app_key =='' ){
+			frappe.msgprint("Please add tiktok app key")
+			return
+		}
+		if( frm.doc.app_secret =='' ){
+			frappe.msgprint("Please add tiktok app secret")
+			return
+		}
+		if( frm.doc.access_token =='' ){
+			frappe.msgprint("Please start connection to get accesstoken")
+			return
+		}
+		frappe.call({
+			async: true,
+			method: "tiktok_integration.zaviago_tiktok.doctype.tiktok_with_erpnext.api.fetch_categories",
+			type: "POST",
+			freeze: true,
+			freeze_message: "Synchronizing categories...",
+			callback:function(r){
+				if( r.message != undefined ){
+					
+					    doc=frappe.get_doc("Website Item")
+						r.message.forEach((element) => {
+							var arr2 = [{ value: element.id, label: element.local_display_name }];
+							options.push(...arr2);
+						  });
+	  
+						  doc.set_df_property('custom_main_category', 'options', options);
+
+					
+				}
+			},
+		});
 	},
 
 });
