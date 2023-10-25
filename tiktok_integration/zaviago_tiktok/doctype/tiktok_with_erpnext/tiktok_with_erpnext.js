@@ -125,9 +125,7 @@ frappe.ui.form.on('Tiktok with ERPnext', {
 						// 	options.push(...arr2);
 						//   });
 						// console.log(doc)
-						doc=frappe.get_doc("Website Item")
-						console.log(frm)
-						doc.set_df_property('custom_main_category', 'options', [{value: "element.id", label: "element.local_display_name"}]);
+						
 
 					
 				}

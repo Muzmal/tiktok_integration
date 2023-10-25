@@ -5,6 +5,7 @@ import requests
 import calendar;
 from datetime import datetime
 import time
+import math
 
 @frappe.whitelist( )
 def fetch_categories(  ):
@@ -44,16 +45,41 @@ def fetch_categories(  ):
         res = requests.get(url, headers=headers)
         if( res.json() ):
             data = res.json()
-            app_details.main_category=json.dumps(data['data']['category_list'])
+            half = len(data['data']['category_list']) / 2
+            #print("half1111 "+ data['data']['category_list'][985]  )
+            
+            if (half % 2 != 0):
+                half1 = len(data['data']['category_list'])/2
+                rounded_down = int(half1 // 1)
+                
+                half2 = len(data['data']['category_list'])/2
+                rounded_up = int(half2 // 1 + 1)
+
+                app_details.main_category=json.dumps(data['data']['category_list'][:rounded_up])
+                app_details.main_category_2=json.dumps(data['data']['category_list'][rounded_down:])
+            else :
+                app_details.main_category=json.dumps(data['data']['category_list'][:half])
+                app_details.main_category_2=json.dumps(data['data']['category_list'][half:])
+            
+            
             app_details.save()
     except:
         print("exception")
-    print( app_details.main_category )
+    
+    # print( app_details.main_category )
+    # print( data['data']['category_list'][:rounded_up] )
+    # print( app_details.main_category_2 )
+
     return "data['data']['category_list']"
 
 
 @frappe.whitelist( )
 def send_categories(  ):
     app_details = frappe.get_doc('Tiktok with ERPnext') 
+    dictA = json.loads(app_details.main_category)
+    dictB = json.loads(app_details.main_category_2)
+    dictA.extend(dictB)
 
-    return app_details.main_category
+
+    val = json.dumps(dictA)
+    return val
