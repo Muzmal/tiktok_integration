@@ -36,6 +36,7 @@ def fetch_categories(  ):
     url = url+path+"?app_key="+str(app_details.app_key)+"&access_token="+str(access_token)+"&sign="+str(signature)+"&timestamp="+str(timestamp)
     payload = json.dumps({
     })
+    print(url)
     headers = {
     'Content-Type': 'application/json'
     }		
@@ -43,8 +44,16 @@ def fetch_categories(  ):
         res = requests.get(url, headers=headers)
         if( res.json() ):
             data = res.json()
-            return data['data']['category_list']
+            app_details.main_category=json.dumps(data['data']['category_list'])
+            app_details.save()
     except:
         print("exception")
-        
+    print( app_details.main_category )
     return "data['data']['category_list']"
+
+
+@frappe.whitelist( )
+def send_categories(  ):
+    app_details = frappe.get_doc('Tiktok with ERPnext') 
+
+    return app_details.main_category

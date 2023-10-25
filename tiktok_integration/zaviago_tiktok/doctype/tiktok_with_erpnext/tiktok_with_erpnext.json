@@ -19,7 +19,8 @@
   "column_break_mxrjz",
   "fetch_products",
   "column_break_n1ycd",
-  "sync_categories"
+  "sync_categories",
+  "main_category"
  ],
  "fields": [
   {
@@ -96,12 +97,18 @@
    "fieldname": "sync_categories",
    "fieldtype": "Button",
    "label": "Sync Categories"
+  },
+  {
+   "fieldname": "main_category",
+   "fieldtype": "Long Text",
+   "hidden": 1,
+   "label": "Tiktok Categories"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-10-24 09:59:34.086324",
+ "modified": "2023-10-25 08:44:10.266252",
  "modified_by": "Administrator",
  "module": "Zaviago Tiktok",
  "name": "Tiktok with ERPnext",

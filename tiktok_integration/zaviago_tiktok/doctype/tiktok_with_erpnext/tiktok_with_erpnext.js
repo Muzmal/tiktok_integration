@@ -119,13 +119,15 @@ frappe.ui.form.on('Tiktok with ERPnext', {
 			callback:function(r){
 				if( r.message != undefined ){
 					
-					    doc=frappe.get_doc("Website Item")
-						r.message.forEach((element) => {
-							var arr2 = [{ value: element.id, label: element.local_display_name }];
-							options.push(...arr2);
-						  });
-	  
-						  doc.set_df_property('custom_main_category', 'options', options);
+					    // options=[]
+						// r.message.forEach((element) => {
+						// 	var arr2 = [{ value: element.id, label: element.local_display_name }];
+						// 	options.push(...arr2);
+						//   });
+						// console.log(doc)
+						doc=frappe.get_doc("Website Item")
+						console.log(frm)
+						doc.set_df_property('custom_main_category', 'options', [{value: "element.id", label: "element.local_display_name"}]);
 
 					
 				}
