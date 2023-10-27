@@ -479,7 +479,10 @@ class handleTiktokRequests:
 			seller_sku='...'
 			price=''
 			l=0
-			
+			if( "product_status" in tiktokProduct ):
+				if( tiktokProduct['product_status'] != 5 ):
+					new_product.active_product=True
+
 			skus_to_update_api_product=[]
 			if( 'skus' in tiktokProduct ):
 				for sku in tiktokProduct['skus']:
@@ -514,6 +517,7 @@ class handleTiktokRequests:
 							
 							stock_infos = sku['stock_infos']
 							for s in stock_infos:
+								new_product.stock_piece=s['available_stock']
 								temp_stock_info=dict({
 									"available_stock":s['available_stock'],
 									"warehouse_id":s['warehouse_id'],

@@ -226,11 +226,13 @@
   {
    "fieldname": "skus_to_update_api_product",
    "fieldtype": "JSON",
+   "hidden": 1,
    "label": "skus_to_update_api_product"
   },
   {
    "fieldname": "images_ids_to_update",
    "fieldtype": "JSON",
+   "hidden": 1,
    "label": "images_ids_to_update"
   },
   {
@@ -241,7 +243,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-10-27 12:26:04.175901",
+ "modified": "2023-10-27 14:09:34.984695",
  "modified_by": "Administrator",
  "module": "Zaviago Tiktok",
  "name": "Tiktok Item",

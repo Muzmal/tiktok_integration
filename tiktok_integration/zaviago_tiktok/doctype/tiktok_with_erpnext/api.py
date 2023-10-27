@@ -133,10 +133,17 @@ def updateTiktokShopProduct( item,product_id ):
         url = 'https://open-api-sandbox.tiktokglobalshop.com'
     else:
         url = 'https://open-api.tiktokglobalshop.com/'
+    # product_price
 
-
+    skus=json.loads(item.skus_to_update_api_product)
+    print(skus)
+    skus[0]['stock_infos'][0]['available_stock']=item.stock_piece
+    skus[0]['original_price']=str(item.product_price)
+   
+    # cod="is_cod_open" : True
+   
     payload = json.dumps({
-    "skus": json.loads( item.skus_to_update_api_product),
+    "skus": skus,
     "images": json.loads(item.images_ids_to_update)
     })
    
@@ -150,6 +157,7 @@ def updateTiktokShopProduct( item,product_id ):
     url = url+path+"?"+query_var+"&sign="+signature
     
     response = requests.request("PUT", url, headers=headers, data=payload)
+    print(response.text)
     data = response.json()
     if( data['code']==0 ):
         frappe.msgprint("Product is updated successfully")

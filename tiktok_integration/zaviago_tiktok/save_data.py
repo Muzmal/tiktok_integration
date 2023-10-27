@@ -605,7 +605,9 @@ class saveTiktokData:
 					k=k+1
 
 			new_product.images_ids_to_update=json.dumps(images_ids_to_update)
-
+			if( "product_status" in tiktokProduct ):
+				if( tiktokProduct['product_status'] != 5 ):
+					new_product.active_product=True
 			if( array_of_images ):
 				del array_of_images[0]
 				# for addImg in array_of_images: 	
@@ -657,6 +659,7 @@ class saveTiktokData:
 						if( 'stock_infos' in sku ):
 							stock_infos = sku['stock_infos']
 							for s in stock_infos:
+								new_product.stock_piece=s['available_stock']
 								temp_stock_info=dict({
 									"available_stock":s['available_stock'],
 									"warehouse_id":s['warehouse_id'],
