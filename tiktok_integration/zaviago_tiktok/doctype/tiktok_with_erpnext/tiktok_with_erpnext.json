@@ -21,7 +21,9 @@
   "column_break_n1ycd",
   "sync_categories",
   "main_category",
-  "main_category_2"
+  "main_category_2",
+  "column_break_spni8",
+  "update_tiktok_shop_product"
  ],
  "fields": [
   {
@@ -110,12 +112,21 @@
    "fieldtype": "Long Text",
    "hidden": 1,
    "label": "Tiktok Categories 2"
+  },
+  {
+   "fieldname": "update_tiktok_shop_product",
+   "fieldtype": "Button",
+   "label": "Update Tiktok Shop Product"
+  },
+  {
+   "fieldname": "column_break_spni8",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-10-25 18:50:52.392242",
+ "modified": "2023-10-26 09:20:25.679339",
  "modified_by": "Administrator",
  "module": "Zaviago Tiktok",
  "name": "Tiktok with ERPnext",

@@ -435,20 +435,31 @@ class handleTiktokRequests:
 			if( 'category_list' in tiktokProduct ):
 				category_list = tiktokProduct['category_list']
 				for i in category_list:
-					print(f" We have found category {i['local_display_name'] }")
+					
 					cat_local_display_name = i['local_display_name']
 					k=k+1
 			new_product.tiktok_product_categories=cat_local_display_name
 			array_of_images=False
+			
+			
+			
+			images_ids_to_update=[]
 			if( 'images' in tiktokProduct ):
 				images=tiktokProduct['images']
+				
 				k=0
 				array_of_images=[]
 				for i in images:
 					if( k==0 ):
 						profileImg = i['thumb_url_list'][0]
+						temp_dict=dict({
+							"id":i['id']
+						})
+						images_ids_to_update.append(temp_dict)
 					array_of_images.append(i['thumb_url_list'])
 					k=k+1
+
+			new_product.images_ids_to_update=json.dumps(images_ids_to_update)
 
 			if( array_of_images ):
 				del array_of_images[0]
@@ -460,6 +471,7 @@ class handleTiktokRequests:
 			description=''
 			if( 'description' in tiktokProduct ):
 				description = tiktokProduct['description']
+			new_product.product_description=description
 			brand_name=''
 			if( 'brand' in tiktokProduct ):
 				brand = tiktokProduct['brand']
@@ -467,15 +479,51 @@ class handleTiktokRequests:
 			seller_sku='...'
 			price=''
 			l=0
+			
+			skus_to_update_api_product=[]
 			if( 'skus' in tiktokProduct ):
 				for sku in tiktokProduct['skus']:
-					seller_sku = sku['seller_sku']
 					price = sku['price']
+					temp=dict({
+						'id': sku['id'], 
+						'sales_attributes': [], 
+						'seller_sku': sku['seller_sku'], 
+						'original_price': price['original_price'], 
+						'stock_infos': [] 
+						})
+
+					seller_sku = sku['seller_sku']
+					
 					price=price['original_price']
 					if( 'sales_attributes' in sku ):
 						sales_attributes = sku['sales_attributes']
 						for j in sales_attributes:
+							temp2=dict({
+								'id':j['id'],
+								'attribute_name':j['name'],
+								'value_id':j['value_id'],
+								'attribute_name':j['name'],
+								'value_name':j['value_name'],
+							})
+							temp['sales_attributes'].append(temp2)
 							l=l+1
+
+						
+
+						if( 'stock_infos' in sku ):
+							
+							stock_infos = sku['stock_infos']
+							for s in stock_infos:
+								temp_stock_info=dict({
+									"available_stock":s['available_stock'],
+									"warehouse_id":s['warehouse_id'],
+								})
+							temp['stock_infos'].append(temp_stock_info)
+						skus_to_update_api_product.append(temp)
+							
+			
+			new_product.skus_to_update_api_product=json.dumps(skus_to_update_api_product)
+			
 			if( l>1 ):
 				is_variable=True
 				seller_sku='...'
@@ -492,7 +540,7 @@ class handleTiktokRequests:
 				new_product.cash_on_delivery_cod=True
 			
 			 
-			
+			new_product.item_name1=tiktokProduct['product_name']
 			new_product.product_name=tiktokProduct['product_name']
 			new_product.erpnext_item_name=tiktokProduct['product_name']
 			new_product.tiktok_shop_item_name=tiktokProduct['product_name']

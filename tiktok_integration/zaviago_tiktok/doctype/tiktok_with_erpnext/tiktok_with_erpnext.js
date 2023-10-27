@@ -8,6 +8,29 @@ frappe.ui.form.on('Tiktok with ERPnext', {
 	// 			frappe.msgprint("Try Connection");	
 	// 		})
 	// 	}
+	update_tiktok_shop_product:function(frm){
+		frappe.prompt([
+			{
+				fieldname: 'web_item',
+				label: __('Select Item'),
+				fieldtype: 'Link',
+				options: 'Tiktok Item',  
+				reqd: 1,
+			},
+		], function(values){
+			frappe.call({
+				method: 'tiktok_integration.zaviago_tiktok.doctype.tiktok_with_erpnext.api.updateTiktokProduct',
+				args: {
+					'web_item': values.web_item,
+				},
+				callback: function(r){
+					if(r.message) {
+					   console.log(r.message);
+					}
+				}
+			});
+		}, __('Update'), 'Submit');
+	},
 	start_connection:function(frm){
 		// frappe.msgprint("test") 
 		// return

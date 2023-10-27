@@ -14,6 +14,7 @@
   "section_break_gkv79",
   "stock_keeping_unit_sku",
   "item_name",
+  "product_description",
   "item_group",
   "route",
   "has_variants",
@@ -42,7 +43,9 @@
   "height_cm",
   "section_break_5bwx1",
   "weight_kg",
-  "marketplace_id"
+  "marketplace_id",
+  "skus_to_update_api_product",
+  "images_ids_to_update"
  ],
  "fields": [
   {
@@ -144,7 +147,7 @@
   },
   {
    "fieldname": "stock_piece",
-   "fieldtype": "Float",
+   "fieldtype": "Data",
    "label": "Stock (piece)"
   },
   {
@@ -185,7 +188,7 @@
   },
   {
    "fieldname": "weight_kg",
-   "fieldtype": "Float",
+   "fieldtype": "Data",
    "label": "Weight (Kg.)"
   },
   {
@@ -219,11 +222,26 @@
    "fieldname": "marketplace_id",
    "fieldtype": "Data",
    "label": "Marketplce ID"
+  },
+  {
+   "fieldname": "skus_to_update_api_product",
+   "fieldtype": "JSON",
+   "label": "skus_to_update_api_product"
+  },
+  {
+   "fieldname": "images_ids_to_update",
+   "fieldtype": "JSON",
+   "label": "images_ids_to_update"
+  },
+  {
+   "fieldname": "product_description",
+   "fieldtype": "Text Editor",
+   "label": "Product Description"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-09-12 14:39:53.346777",
+ "modified": "2023-10-27 12:26:04.175901",
  "modified_by": "Administrator",
  "module": "Zaviago Tiktok",
  "name": "Tiktok Item",
