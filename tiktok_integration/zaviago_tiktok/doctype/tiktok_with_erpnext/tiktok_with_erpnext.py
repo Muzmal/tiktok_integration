@@ -452,10 +452,10 @@ class handleTiktokRequests:
 				for i in images:
 					if( k==0 ):
 						profileImg = i['thumb_url_list'][0]
-						temp_dict=dict({
-							"id":i['id']
-						})
-						images_ids_to_update.append(temp_dict)
+					temp_dict=dict({
+						"id":i['id']
+					})
+					images_ids_to_update.append(temp_dict)
 					array_of_images.append(i['thumb_url_list'])
 					k=k+1
 
@@ -463,11 +463,11 @@ class handleTiktokRequests:
 
 			if( array_of_images ):
 				del array_of_images[0]
-				# for addImg in array_of_images: 	
-				# 	new_product.append('additional_images',{
-				# 		"additional_image_src":addImg[0],
-				# 		"additional_image":addImg[0]
-				# 	})
+				for addImg in array_of_images: 	
+					new_product.append('additional_images',{
+						"additional_image_src":addImg[0],
+						"additional_image":addImg[0]
+					})
 			description=''
 			if( 'description' in tiktokProduct ):
 				description = tiktokProduct['description']
@@ -530,7 +530,7 @@ class handleTiktokRequests:
 			
 			if( l>1 ):
 				is_variable=True
-				seller_sku='...'
+				seller_sku='no-sku-'+str(tiktokProduct['product_id'])
 			new_product.has_variants=is_variable
 			if( "package_width" in tiktokProduct ):
 				new_product.width_cm =tiktokProduct['package_width']
@@ -572,8 +572,8 @@ class handleTiktokRequests:
 			)
 			
 			frappe.db.commit()
-			if( seller_sku=='' or  seller_sku == '...' ):
-				seller_sku="no-sku-"+str(tiktokProduct['product_id'])
+			if( seller_sku =='' ):
+				seller_sku='no-sku-'+str(tiktokProduct['product_id'])
 			Item = frappe.db.exists("Item", str(seller_sku))
 			if( Item == None ):
 				self.create_product(tiktokProduct['product_name'],seller_sku,"By-product","no")

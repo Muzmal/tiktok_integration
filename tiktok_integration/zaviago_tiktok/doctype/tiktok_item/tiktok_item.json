@@ -15,6 +15,7 @@
   "stock_keeping_unit_sku",
   "item_name",
   "product_description",
+  "additional_images",
   "item_group",
   "route",
   "has_variants",
@@ -210,7 +211,7 @@
   },
   {
    "fieldname": "profile_image_src",
-   "fieldtype": "Attach",
+   "fieldtype": "Attach Image",
    "label": "Image"
   },
   {
@@ -232,18 +233,23 @@
   {
    "fieldname": "images_ids_to_update",
    "fieldtype": "JSON",
-   "hidden": 1,
    "label": "images_ids_to_update"
   },
   {
    "fieldname": "product_description",
    "fieldtype": "Text Editor",
    "label": "Product Description"
+  },
+  {
+   "fieldname": "additional_images",
+   "fieldtype": "Table",
+   "label": "Additional Images",
+   "options": "Tiktok Product Images"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-10-27 14:09:34.984695",
+ "modified": "2023-10-30 13:53:05.126005",
  "modified_by": "Administrator",
  "module": "Zaviago Tiktok",
  "name": "Tiktok Item",
