@@ -5,6 +5,7 @@ import requests
 import calendar;
 from datetime import datetime
 import time
+import base64
 try:
     import urlparse
     from urllib import urlencode
@@ -105,6 +106,9 @@ def updateTiktokProduct( web_item ):
 
 @frappe.whitelist( )
 def updateTiktokShopProduct( item,product_id ):
+    responseImages = checkImages( item )
+    
+    print("we are updating product")
     path='/api/products'
     app_details = frappe.get_doc('Tiktok with ERPnext')
     access_token = app_details.get_password('access_token')
@@ -139,14 +143,17 @@ def updateTiktokShopProduct( item,product_id ):
     print(skus)
     skus[0]['stock_infos'][0]['available_stock']=item.stock_piece
     skus[0]['original_price']=str(item.product_price)
-   
+
     # cod="is_cod_open" : True
-   
+    
+    
+    print("json.loads(item.images_ids_to_update)")
+    print(json.loads(item.images_ids_to_update))
     payload = json.dumps({
     "skus": skus,
     "images": json.loads(item.images_ids_to_update)
     })
-   
+
     
 
     headers = {
@@ -157,11 +164,108 @@ def updateTiktokShopProduct( item,product_id ):
     url = url+path+"?"+query_var+"&sign="+signature
     
     response = requests.request("PUT", url, headers=headers, data=payload)
-    print(response.text)
+    
     data = response.json()
     if( data['code']==0 ):
         frappe.msgprint("Product is updated successfully")
     else:
         frappe.msgprint("Something went wrong while updating product")
-    
     return payload
+
+def checkImages( doc ):
+    images = doc.additional_images
+    doc.additional_images=[]
+    image_ids = []
+    for img in images:
+        img_doc = frappe.get_doc("Tiktok Product Images",img)
+        if( img_doc.tiktok_image_id == '0' ):
+            response = uploadImage(img_doc.additional_image_src)
+            if ( response==False ):
+                return "Error in image " + str(img_doc.additional_image_src)
+            else:
+                doc.append('additional_images',{
+						"additional_image_src":img_doc.additional_image_src,
+						"additional_image":img_doc.additional_image_src,
+						"tiktok_image_id":str(response)
+                })
+                tiktok_image_id=str(response)
+        else:
+            doc.append('additional_images',{
+						"additional_image_src":img_doc.additional_image_src,
+						"additional_image":img_doc.additional_image_src,
+						"tiktok_image_id":str(img_doc.tiktok_image_id)
+            })
+            tiktok_image_id=str(img_doc.tiktok_image_id)
+        
+        image_ids.append( {
+            "id":tiktok_image_id
+        } )
+    image_ids=json.dumps(image_ids)
+    doc.images_ids_to_update=image_ids
+    print(doc.additional_images)
+    print("doc.images_ids_to_update")
+    doc.save()
+    frappe.db.commit()
+    return True
+
+
+def uploadImage( img_link ):
+    path="/api/products/upload_imgs"
+    app_details = frappe.get_doc('Tiktok with ERPnext') 
+    access_token = app_details.get_password('access_token')
+    app_secret = app_details.get_password('app_secret')
+    gmt = time.gmtime()
+    timestamp = calendar.timegm(gmt)    
+    query = {
+        "app_key":app_details.app_key,
+        'access_token':access_token,
+        'timestamp':timestamp,
+    }
+    query_var=urlencode(query)
+    params_for_sign = query
+    del params_for_sign['access_token']
+    ##################################
+    tiktok=saveTiktokData()
+    signature = tiktok._getSignature(path,params_for_sign,app_secret)
+    if( app_details.is_sandbox == True ):
+        url = 'https://open-api-sandbox.tiktokglobalshop.com'
+    else:
+        url = 'https://open-api.tiktokglobalshop.com/'
+
+
+    url = url+path+"?"+query_var+"&sign="+signature
+    
+    # with open(requests.get(img_link).content, "rb") as f:
+    #     encoded_image = base64.b64encode(f.read())
+    
+    
+    img_link = "https://p16-oec-va.ibyteimg.com/tos-maliva-i-o3syd03w52-us/a0b48edc088e4e83b1b9cbfda91ec395~tplv-dx0w9n1ysr-resize-jpeg:300:300.jpeg?from=522366036"
+    
+
+
+    # data = str(data)
+    # sample_string_bytes = data.encode("ascii") 
+    # base64_bytes = base64.b64encode(sample_string_bytes) 
+    # base64_string = base64_bytes.decode("ascii") 
+
+   
+    convert = base64.b64encode(requests.get(img_link).content)
+    convert=convert.decode('utf-8')
+    payload = json.dumps({
+    "img_data": convert,
+    "img_scene": 1
+    })
+
+    headers = {
+    'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+    print(response.text) 
+    print('response.text')
+    data = response.json()
+    if( data['code']==0 ):
+       r = data['data']
+       return str(r['img_id'])
+    else:
+        return False

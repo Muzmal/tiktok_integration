@@ -444,6 +444,7 @@ class handleTiktokRequests:
 			
 			
 			images_ids_to_update=[]
+			image_ids_for_table=[]
 			if( 'images' in tiktokProduct ):
 				images=tiktokProduct['images']
 				
@@ -457,17 +458,21 @@ class handleTiktokRequests:
 					})
 					images_ids_to_update.append(temp_dict)
 					array_of_images.append(i['thumb_url_list'])
+					image_ids_for_table.append(i['id'])
 					k=k+1
 
 			new_product.images_ids_to_update=json.dumps(images_ids_to_update)
-
+			
 			if( array_of_images ):
 				del array_of_images[0]
+				i=1
 				for addImg in array_of_images: 	
 					new_product.append('additional_images',{
 						"additional_image_src":addImg[0],
-						"additional_image":addImg[0]
+						"additional_image":addImg[0],
+						"tiktok_image_id":str(image_ids_for_table[i])
 					})
+					i=i+1
 			description=''
 			if( 'description' in tiktokProduct ):
 				description = tiktokProduct['description']
